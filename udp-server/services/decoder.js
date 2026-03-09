@@ -1,25 +1,32 @@
 import cbor from "cbor";
+const LEN_SIZE = 2;
+const HASH_SIZE = 6;
+const SERIAL_NUMBER_SIZE = 4;
+const LEN_HASH_SIZE = (LEN_SIZE + HASH_SIZE);
+const HEADER_SIZE = (LEN_HASH_SIZE + SERIAL_NUMBER_SIZE);
 
-export const decodeMessage = async (data) => {
-  const { serial_number, raw, timestamp } = data;
+export const decodeMessage = async (msg) => {
 
+  const serialNumber = msg.readUInt32LE(LEN_HASH_SIZE);
+  const raw = msg.slice(HEADER_SIZE);
   try {
-    //DECODE WITH CBOR
-    const decoded = cbor.decodeFirstSync(raw);
-    console.log(`[Decoder] Data from device: ${serial_number}:`, decoded);
+
+    //DECODE RAW WITH CBOR
+    const decodedRawData = cbor.decodeFirstSync(raw);
+    console.log(`[Decoder] Data from device: ${serialNumber}:`, decodedRawData);
 
     //STRUCTURE DATA
     const processedData = {
-      serial_number: serial_number,
-      in: decoded.in || 0,
-      out: decoded.out || 0,
-      battery: decoded.v || null,
-      timestamp: new Date(timestamp * 1000),
+      serialNumber: serialNumber,
+      in: decodedRawData.in || 0,
+      out: decodedRawData.out || 0,
+      battery: decodedRawData.v || null,
+      timestamp: Math.floor((new Date().getTime()) / 1000),
     };
     return processedData;
   } catch (error) {
     console.error(
-      `Decoder failed for device: ${serial_number}:`,
+      `Decoder failed for device: ${serialNumber}:`,
       error.message,
     );
     throw error;
