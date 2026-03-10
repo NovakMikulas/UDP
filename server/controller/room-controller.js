@@ -4,34 +4,38 @@ import roomGetAbl from "../abl/room/room-get-abl.js";
 import roomUpdateAbl from "../abl/room/room-update-abl.js";
 
 export const roomController = {
-  create: async (request, reply) => {
+  create: async (req, res, next) => {
     try {
-      const newRoom = request.body;
+      const newRoom = req.body;
       await roomCreateAbl(newRoom);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  delete: async (request, reply) => {
+  delete: async (req, res, next) => {
     try {
-      const id = request.body.id;
+      const id = req.body.id;
       await roomDeleteAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  get: async (request, reply) => {
+  get: async (req, res, next) => {
     try {
-      const id = request.params.id;
+      const id = req.params.id;
       await roomGetAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  update: async (request, reply) => {
+  update: async (req, res, next) => {
     try {
-      const updatedRoom = request.body;
+      const updatedRoom = req.body;
       await roomUpdateAbl(updatedRoom);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }

@@ -4,34 +4,38 @@ import locationGetAbl from "../abl/location/location-get-abl.js";
 import locationUpdateAbl from "../abl/location/location-update-abl.js";
 
 export const locationController = {
-  create: async (request, reply) => {
+  create: async (req, res, next) => {
     try {
-      const newLocation = request.body;
+      const newLocation = req.body;
       await locationCreateAbl(newLocation);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  delete: async (request, reply) => {
+  delete: async (req, res, next) => {
     try {
-      const id = request.body.id;
+      const id = req.body.id;
       await locationDeleteAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  get: async (request, reply) => {
+  get: async (req, res, next) => {
     try {
-      const id = request.params.id;
+      const id = req.params.id;
       await locationGetAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  update: async (request, reply) => {
+  update: async (req, res, next) => {
     try {
-      const updatedLocation = request.body;
+      const updatedLocation = req.body;
       await locationUpdateAbl(updatedLocation);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }

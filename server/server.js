@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors);
+app.use(cors());
 app.use("/api/device", deviceRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/room", roomRoutes);

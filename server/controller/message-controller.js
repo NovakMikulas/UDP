@@ -4,34 +4,38 @@ import messageGetAbl from "../abl/message/message-get-abl.js";
 import messageUpdateAbl from "../abl/message/message-update-abl.js";
 
 export const messageController = {
-  create: async (request, reply) => {
+  create: async (req, res, next) => {
     try {
-      const newMessage = request.body;
+      const newMessage = req.body;
       await messageCreateAbl(newMessage);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  delete: async (request, reply) => {
+  delete: async (req, res, next) => {
     try {
-      const id = request.body.id;
+      const id = req.body.id;
       await messageDeleteAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  get: async (request, reply) => {
+  get: async (req, res, next) => {
     try {
-      const id = request.params.id;
+      const id = req.params.id;
       await messageGetAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  update: async (request, reply) => {
+  update: async (req, res, next) => {
     try {
-      const updatedMessage = request.body;
+      const updatedMessage = req.body;
       await messageUpdateAbl(updatedMessage);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }

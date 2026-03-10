@@ -1,5 +1,7 @@
 import Ajv from "ajv";
+import addFormats from "ajv-formats";
 const ajv = new Ajv();
+addFormats(ajv);
 import messageCreateDao from "../../dao/message/message-create-dao.js";
 import ApiError from "../../utils/api-error.js";
 const schema = {
