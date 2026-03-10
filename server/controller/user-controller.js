@@ -4,34 +4,38 @@ import userGetAbl from "../abl/user/user-get-abl.js";
 import userUpdateAbl from "../abl/user/user-update-abl.js";
 
 export const userController = {
-  create: async (request, reply) => {
+  create: async (req, res) => {
     try {
-      const reqParam = request.body;
-      await userCreateAbl();
+      const newUser = req.body;
+      await userCreateAbl(newUser);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  delete: async (request, reply) => {
+  delete: async (req, res) => {
     try {
-      const id = request.body.id;
-      await userDeleteAbl();
+      const id = req.body.id;
+      await userDeleteAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  get: async (request, reply) => {
+  get: async (req, res) => {
     try {
-      const id = request.params.id;
-      await userGetAbl();
+      const id = req.params.id;
+      await userGetAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  update: async (request, reply) => {
+  update: async (req, res) => {
     try {
-      const updatedUser = request.body;
-      await userUpdateAbl();
+      const updatedUser = req.body;
+      await userUpdateAbl(updatedUser);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }

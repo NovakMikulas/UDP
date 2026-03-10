@@ -14,7 +14,7 @@ server.on("listening", () => {
   const address = server.address();
   console.log(`UDP server is running on port: ${address.port}`);
 });
-server.on("message", (msg, rinfo) => { });
+server.on("message", (msg, rinfo) => {});
 
 //SERVER ERROR HANDLING
 server.on("error", (err) => {
@@ -24,12 +24,12 @@ server.on("error", (err) => {
 
 server.bind(PORT);
 
-server.on("message", (msg, rinfo) => {
+server.on("message", async (msg, rinfo) => {
   // msg = raw binary data (Buffer)
   // rinfo = information about sender (IP, port, etc...)
-  if (!validateMessage(msg)) {
+  if (!(await validateMessage(msg))) {
     return;
   }
-  const processedData = decodeMessage(msg);
-  sendWebhook(processedData);
+  const processedData = await decodeMessage(msg);
+  await sendWebhook(processedData);
 });

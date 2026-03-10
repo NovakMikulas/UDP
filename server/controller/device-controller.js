@@ -4,34 +4,38 @@ import deviceGetAbl from "../abl/device/device-get-abl.js";
 import deviceUpdateAbl from "../abl/device/device-update-abl.js";
 
 export const deviceController = {
-  create: async (request, reply) => {
+  create: async (req, res, next) => {
     try {
-      const newDevice = request.body;
+      const newDevice = req.body;
       await deviceCreateAbl(newDevice);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  delete: async (request, reply) => {
+  delete: async (req, res, next) => {
     try {
-      const id = request.body.id;
+      const id = req.body.id;
       await deviceDeleteAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  get: async (request, reply) => {
+  get: async (req, res, next) => {
     try {
-      const id = request.params.id;
+      const id = req.params.id;
       await deviceGetAbl(id);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
   },
-  update: async (request, reply) => {
+  update: async (req, res, next) => {
     try {
-      const updatedDevice = request.body;
+      const updatedDevice = req.body;
       await deviceUpdateAbl(updatedDevice);
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
