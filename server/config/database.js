@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const dbConfig = async () => {
+const dbConfig = async () => {
   try {
     const conn = await mongoose.connect(
       process.env.MONGO_URI || "mongodb://localhost:27017/iotdb",
@@ -11,3 +11,4 @@ export const dbConfig = async () => {
     process.exit(1); //SHUTDOWN APP IN CASE OF ERROR
   }
 };
+export default dbConfig;
