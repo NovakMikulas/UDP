@@ -1,5 +1,5 @@
 import { deviceController } from "../controller/device-controller.js";
-
+import express from "express";
 const router = express.Router();
 
 router.post("/create", deviceController.create);
