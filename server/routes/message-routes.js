@@ -1,4 +1,6 @@
 import { messageController } from "../controller/message-controller.js";
+import authMiddleware from "../middleware/auth/authenticate-middleware.js";
+
 import express from "express";
 const router = express.Router();
 
