@@ -1,8 +1,8 @@
 import LOCATION_MODEL from "../../models/Location.js";
 
-async function locationListDao(user_id) {
+async function locationListDao(userId) {
   return await LOCATION_MODEL.find({
-    $or: [{ owner_id: user_id }, { members: user_id }],
+    $or: [{ owner_id: userId }, { members: userId }],
   });
 }
 export default locationListDao;

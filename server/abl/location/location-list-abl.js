@@ -12,15 +12,15 @@ const schema = {
   additionalProperties: false,
 };
 
-async function locationListAbl(user_id) {
-  const userObject = { user_id: user_id };
+async function locationListAbl(userId) {
+  const userObject = { user_id: userId };
   const validate = ajv.compile(schema);
   const valid = validate(userObject);
   if (!valid) {
     const message = validate.errors?.map((err) => err.message).join(", ");
     throw new ApiError(400, `[ABL] Validation failed: ${message}`);
   }
-  const locations = await locationListDao(user_id);
+  const locations = await locationListDao(userId);
   if (!locations) {
     throw new ApiError(400, `[ABL] No locations found for the specified user`);
   }

@@ -3,7 +3,7 @@ import locationGetDao from "../../dao/location/location-get-dao.js";
 const authorizeLocation = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const locationId = req.params.id || req.body.id;
+      const locationId = req.params.locationId || req.body.locationId;
       const userId = req.user.id;
 
       if (!locationId) {

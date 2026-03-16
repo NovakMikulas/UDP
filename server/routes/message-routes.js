@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/create", messageController.create);
 
-//router.get("/list", authMiddleware, messageController.list);
+router.get("/list/:deviceId", authMiddleware, messageController.list);
 
 router.get("/get/:id", messageController.get);
 

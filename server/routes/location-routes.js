@@ -7,21 +7,21 @@ const router = express.Router();
 router.post("/create", authMiddleware, locationController.create);
 
 router.get(
-  "/get/:id",
+  "/get/:locationId",
   authMiddleware,
   authorizeLocation(["Owner", "Member"]),
   locationController.get,
 );
 
 router.put(
-  "/update/:id",
+  "/update/:locationId",
   authMiddleware,
   authorizeLocation(["Owner"]),
   locationController.update,
 );
 
 router.delete(
-  "/delete/:id",
+  "/delete/:locationId",
   authMiddleware,
   authorizeLocation(["Owner"]),
   locationController.delete,

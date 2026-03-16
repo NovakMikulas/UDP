@@ -18,7 +18,7 @@ export const locationController = {
   },
   delete: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.locationId;
       await locationDeleteAbl(id);
       res.status(200).json({ status: "success" });
     } catch (error) {
@@ -27,7 +27,7 @@ export const locationController = {
   },
   get: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.locationId;
       const location = await locationGetAbl(id);
       res.status(200).json({ status: "success", data: location });
     } catch (error) {
@@ -49,8 +49,8 @@ export const locationController = {
   },
   list: async (req, res, next) => {
     try {
-      const user_id = req.user.id;
-      const locations = await locationListAbl(user_id);
+      const userId = req.user.id;
+      const locations = await locationListAbl(userId);
       res.status(200).json({ status: "success", data: locations });
     } catch (error) {
       next(error);

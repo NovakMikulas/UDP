@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/create", authMiddleware, deviceController.create);
 
-//router.get("/list", authMiddleware, deviceController.list);
+router.get("/list/:roomId", authMiddleware, deviceController.list);
 
 router.get("/get/:id", authMiddleware, deviceController.get);
 
