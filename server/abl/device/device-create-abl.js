@@ -7,9 +7,8 @@ const schema = {
   properties: {
     roomId: { type: "string" },
     serialNumber: { type: "string" },
-    name: { type: "string" },
   },
-  required: ["name", "serialNumber", "roomId"],
+  required: ["serialNumber", "roomId"],
 };
 
 async function deviceCreateAbl(data) {

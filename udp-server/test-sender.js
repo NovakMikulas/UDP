@@ -10,12 +10,12 @@ const payload = cbor.encode({
   in: 10,
   out: 4,
   battery: 100,
-  timestamp: new Date().toISOString(),
-  device_id: "507f1f77bcf86cd799439011", // Náhodný MongoDB ObjectId string
+  timestamp: new Date().toISOString()
+  //serialNumber: "123", // Náhodný MongoDB ObjectId string
 });
 
 const serialNumber = Buffer.alloc(4);
-serialNumber.writeUInt32LE(12345678);
+serialNumber.writeUInt32LE(123);
 
 const partToHash = Buffer.concat([serialNumber, payload]);
 const hash = crypto

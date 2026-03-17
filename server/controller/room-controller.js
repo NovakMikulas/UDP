@@ -6,9 +6,9 @@ import roomListAbl from "../abl/room/room-list-abl.js";
 export const roomController = {
   create: async (req, res, next) => {
     try {
-      const newRoom = req.body;
-      await roomCreateAbl(newRoom);
-      res.status(201).json({ status: "success" });
+      const data = req.body;
+      const room = await roomCreateAbl(data);
+      res.status(201).json({ status: "success", data: room });
     } catch (error) {
       next(error);
     }
@@ -25,17 +25,21 @@ export const roomController = {
   get: async (req, res, next) => {
     try {
       const id = req.params.roomId;
-      await roomGetAbl(id);
-      res.status(200).json({ status: "success" });
+      const room = await roomGetAbl(id);
+      res.status(200).json({ status: "success", data: room });
     } catch (error) {
       next(error);
     }
   },
   update: async (req, res, next) => {
     try {
-      const updatedRoom = req.body;
-      await roomUpdateAbl(updatedRoom);
-      res.status(200).json({ status: "success" });
+      const room = req.body;
+      const data = {
+        ...room,
+        id: req.params.roomId,
+      };
+      const updatedRoom = await roomUpdateAbl(data);
+      res.status(200).json({ status: "success", data: updatedRoom });
     } catch (error) {
       next(error);
     }

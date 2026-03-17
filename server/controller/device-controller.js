@@ -6,16 +6,16 @@ import deviceListAbl from "../abl/device/device-list-abl.js";
 export const deviceController = {
   create: async (req, res, next) => {
     try {
-      const newDevice = req.body;
-      await deviceCreateAbl(newDevice);
-      res.status(201).json({ status: "success" });
+      const data = req.body;
+      const newDevice = await deviceCreateAbl(data);
+      res.status(201).json({ status: "success", data: newDevice });
     } catch (error) {
       next(error);
     }
   },
   delete: async (req, res, next) => {
     try {
-      const id = req.body.id;
+      const id = req.params.id;
       await deviceDeleteAbl(id);
       res.status(200).json({ status: "success" });
     } catch (error) {
@@ -25,17 +25,21 @@ export const deviceController = {
   get: async (req, res, next) => {
     try {
       const id = req.params.id;
-      await deviceGetAbl(id);
-      res.status(200).json({ status: "success" });
+      const device = await deviceGetAbl(id);
+      res.status(200).json({ status: "success", data: device });
     } catch (error) {
       next(error);
     }
   },
   update: async (req, res, next) => {
     try {
-      const updatedDevice = req.body;
-      await deviceUpdateAbl(updatedDevice);
-      res.status(200).json({ status: "success" });
+      const device = req.body;
+      const data = {
+        ...device,
+        id: req.params.id,
+      };
+      const updatedDevice = await deviceUpdateAbl(data);
+      res.status(200).json({ status: "success", data: updatedDevice });
     } catch (error) {
       next(error);
     }

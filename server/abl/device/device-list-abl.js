@@ -6,9 +6,9 @@ import deviceListDao from "../../dao/device/device-list-dao.js";
 const schema = {
   type: "object",
   properties: {
-    userId: { type: "string" },
+    roomId: { type: "string" },
   },
-  required: ["userId"],
+  required: ["roomId"],
   additionalProperties: false,
 };
 

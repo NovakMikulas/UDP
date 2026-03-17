@@ -3,27 +3,39 @@ import addFormats from "ajv-formats";
 const ajv = new Ajv();
 addFormats(ajv);
 import messageCreateDao from "../../dao/message/message-create-dao.js";
+import deviceGetBySerialDao from "../../dao/device/device-getBySerial-dao.js";
 import ApiError from "../../utils/api-error.js";
 const schema = {
   type: "object",
   properties: {
-    deviceId: { type: "string" },
+    serialNumber: { type: "string" },
     in: { type: "number" },
     out: { type: "number" },
     battery: { type: "number" },
-    timestamp: { type: "string", format: "date-time" },
   },
-  required: ["deviceId", "in", "out", "battery", "timestamp"],
+  required: ["serialNumber", "in", "out", "battery"],
 };
 
 async function messageCreateAbl(data) {
   const validate = ajv.compile(schema);
   const valid = validate(data);
+  const device = await deviceGetBySerialDao(data.serialNumber);
+  if (!device) {
+    throw new ApiError(
+      404,
+      `[ABL] Device with serial number ${data.serialNumber} not found`,
+    );
+  }
+
   if (!valid) {
     const message = validate.errors?.map((err) => err.message).join(", ");
     throw new ApiError(400, `[ABL] Validation failed: ${message}`);
   }
-  return await messageCreateDao(data);
+  const processedData = {
+    ...data,
+    deviceId: device._id,
+  };
+  return await messageCreateDao(processedData);
 }
 
 export default messageCreateAbl;

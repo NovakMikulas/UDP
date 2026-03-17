@@ -6,7 +6,6 @@ const messageSchema = new Schema(
     in: { type: Number, default: 0 },
     out: { type: Number, default: 0 },
     battery: { type: Number },
-    timestamp: { type: Date, default: Date.now },
   },
   { timestamps: true },
 );

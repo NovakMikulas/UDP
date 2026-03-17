@@ -20,7 +20,7 @@ async function messageListAbl(deviceId) {
     const message = validate.errors?.map((err) => err.message).join(", ");
     throw new ApiError(400, `[ABL] Validation failed: ${message}`);
   }
-  const messages = await messageListDao(userId);
+  const messages = await messageListDao(deviceId);
   if (!messages) {
     throw new ApiError(400, `[ABL] No messages found for the specified device`);
   }

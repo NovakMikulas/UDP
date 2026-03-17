@@ -1,4 +1,8 @@
 import axios from "axios";
+import crypto from "crypto";
+import dotenv from "dotenv";
+dotenv.config();
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "default";
 
 export const sendWebhook = async (data) => {
   const WEBHOOK_URL =
@@ -8,21 +12,25 @@ export const sendWebhook = async (data) => {
     console.warn("[Webhook] URL is not defined in .env");
     return;
   }
-
+  console.log("[Webhook] Sending data to webhook:", data);
   try {
+    const body = JSON.stringify(data);
+    const signature = crypto
+      .createHmac("sha256", WEBHOOK_SECRET)
+      .update(body)
+      .digest("hex");
+
     const response = await axios.post(
       WEBHOOK_URL,
+      body,
       {
-        device_id: data.device_id,
-        serialNumber: data.serialNumber,
-        in: data.in,
-        out: data.out,
-        battery: data.battery,
-        timestamp: data.timestamp,
+        headers: {
+          "Content-Type": "application/json",
+          "x-signature": signature,
+          "x-source": "udp-server",
+        },
       },
-      {
-        timeout: 5000, //5s server timeout
-      },
+      { timeout: 5000 },
     );
 
     console.log(`[Webhook] successfully send: ${response.status}`);
