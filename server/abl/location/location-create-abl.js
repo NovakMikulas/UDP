@@ -5,12 +5,12 @@ import ApiError from "../../utils/api-error.js";
 const schema = {
   type: "object",
   properties: {
-    owner_id: { type: "string" },
-    authorized_users: { type: "array", items: { type: "string" } },
+    ownerId: { type: "string" },
+    authorizedUsers: { type: "array", items: { type: "string" } },
     name: { type: "string" },
     address: { type: "string" },
   },
-  required: ["name", "address", "owner_id"],
+  required: ["name", "address", "ownerId"],
 };
 
 async function locationCreateAbl(data) {

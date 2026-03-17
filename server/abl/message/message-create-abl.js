@@ -7,13 +7,13 @@ import ApiError from "../../utils/api-error.js";
 const schema = {
   type: "object",
   properties: {
-    device_id: { type: "string" },
+    deviceId: { type: "string" },
     in: { type: "number" },
     out: { type: "number" },
     battery: { type: "number" },
     timestamp: { type: "string", format: "date-time" },
   },
-  required: ["device_id", "in", "out", "battery", "timestamp"],
+  required: ["deviceId", "in", "out", "battery", "timestamp"],
 };
 
 async function messageCreateAbl(data) {

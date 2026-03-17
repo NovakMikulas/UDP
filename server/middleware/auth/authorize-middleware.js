@@ -1,16 +1,23 @@
 import ApiError from "../../utils/api-error.js";
 import locationGetDao from "../../dao/location/location-get-dao.js";
+
 const authorizeLocation = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const locationId = req.params.locationId || req.body.locationId;
+      // Extract locationId from URL params, headers, body, or query
+      const locationId =
+        req.params.locationId ||
+        req.headers["x-location-id"] ||
+        req.body.locationId ||
+        req.query.locationId;
+
       const userId = req.user.id;
 
       if (!locationId) {
         return next(
           new ApiError(
             400,
-            "[MIDDLEWARE] Location ID must be provided in URL parameters or request body.",
+            "[MIDDLEWARE] Location ID missing. Provide it in URL, Headers (x-location-id), or Body.",
           ),
         );
       }
@@ -22,9 +29,12 @@ const authorizeLocation = (allowedRoles) => {
 
       let userRole = null;
 
-      if (location.owner_id.toString() === userId) {
+      if (location.ownerId.toString() === userId) {
         userRole = "Owner";
-      } else if (location.members.some((m) => m.toString() === userId)) {
+      } else if (
+        location.members &&
+        location.members.some((m) => m.toString() === userId)
+      ) {
         userRole = "Member";
       }
 
@@ -36,12 +46,14 @@ const authorizeLocation = (allowedRoles) => {
           ),
         );
       }
-
+      req.locationId = locationId;
       req.locationRole = userRole;
+
       next();
     } catch (error) {
       next(error);
     }
   };
 };
+
 export default authorizeLocation;

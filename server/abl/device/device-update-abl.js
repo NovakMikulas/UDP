@@ -8,8 +8,8 @@ const schema = {
   type: "object",
   properties: {
     id: { type: "string" },
-    room_id: { type: "string" },
-    serial_number: { type: "string" },
+    roomId: { type: "string" },
+    serialNumber: { type: "string" },
     name: { type: "string" },
   },
   required: ["id"],

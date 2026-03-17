@@ -5,11 +5,11 @@ import ApiError from "../../utils/api-error.js";
 const schema = {
   type: "object",
   properties: {
-    location_id: { type: "string" },
+    locationId: { type: "string" },
     name: { type: "string" },
     capacity: { type: "number" },
   },
-  required: ["name", "location_id", "capacity"],
+  required: ["name", "locationId", "capacity"],
 };
 
 async function roomCreateAbl(data) {

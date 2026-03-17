@@ -13,7 +13,7 @@ const schema = {
 };
 
 async function locationDeleteAbl(id) {
-  const idObject = { id: id };
+  const idObject = { id };
   const validate = ajv.compile(schema);
   const valid = validate(idObject);
   if (!valid) {

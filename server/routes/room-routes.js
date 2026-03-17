@@ -1,17 +1,42 @@
 import { roomController } from "../controller/room-controller.js";
 import authMiddleware from "../middleware/auth/authenticate-middleware.js";
-import authorizeLocation from "../middleware/auth/authorize-location-middleware.js";
+import authorizeMiddleware from "../middleware/auth/authorize-middleware.js";
 import express from "express";
 const router = express.Router();
 
-router.post("/create", authMiddleware, roomController.create);
+router.post(
+  "/create",
+  authMiddleware,
+  authorizeMiddleware(["Owner", "Member"]),
+  roomController.create,
+);
 
-router.get("/list/:locationId", authMiddleware, authorizeLocation(["Owner", "Member"]), roomController.list);
+router.get(
+  "/list/:locationId",
+  authMiddleware,
+  authorizeMiddleware(["Owner", "Member"]),
+  roomController.list,
+);
 
-router.get("/get/:roomId", authMiddleware, roomController.get);
+router.get(
+  "/get/:roomId",
+  authMiddleware,
+  authorizeMiddleware(["Owner", "Member"]),
+  roomController.get,
+);
 
-router.put("/update/:roomId", authMiddleware, roomController.update);
+router.put(
+  "/update/:roomId",
+  authMiddleware,
+  authorizeMiddleware(["Owner"]),
+  roomController.update,
+);
 
-router.delete("/delete/:roomId", authMiddleware, roomController.delete);
+router.delete(
+  "/delete/:roomId",
+  authMiddleware,
+  authorizeMiddleware(["Owner"]),
+  roomController.delete,
+);
 
 export default router;

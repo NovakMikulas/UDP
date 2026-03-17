@@ -6,14 +6,14 @@ import locationListDao from "../../dao/location/location-list-dao.js";
 const schema = {
   type: "object",
   properties: {
-    user_id: { type: "string" },
+    userId: { type: "string" },
   },
-  required: ["user_id"],
+  required: ["userId"],
   additionalProperties: false,
 };
 
 async function locationListAbl(userId) {
-  const userObject = { user_id: userId };
+  const userObject = { userId };
   const validate = ajv.compile(schema);
   const valid = validate(userObject);
   if (!valid) {

@@ -8,7 +8,7 @@ const schema = {
   type: "object",
   properties: {
     id: { type: "string" },
-    location_id: { type: "string" },
+    locationId: { type: "string" },
     name: { type: "string" },
     capacity: { type: "number" },
   },

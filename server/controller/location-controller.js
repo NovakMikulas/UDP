@@ -8,7 +8,7 @@ export const locationController = {
     try {
       const data = {
         ...req.body,
-        owner_id: req.user.id,
+        ownerId: req.user.id,
       };
       await locationCreateAbl(data);
       res.status(201).json({ status: "success" });
@@ -36,13 +36,13 @@ export const locationController = {
   },
   update: async (req, res, next) => {
     try {
-      const updatedLocation = req.body;
+      const location = req.body;
       const data = {
-        ...updatedLocation,
-        id: req.params.id,
+        ...location,
+        id: req.params.locationId,
       };
-      await locationUpdateAbl(data);
-      res.status(200).json({ status: "success" });
+      const updatedLocation = await locationUpdateAbl(data);
+      res.status(200).json({ status: "success", data: updatedLocation });
     } catch (error) {
       next(error);
     }
