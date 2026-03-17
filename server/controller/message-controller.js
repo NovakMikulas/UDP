@@ -1,13 +1,13 @@
 import messageCreateAbl from "../abl/message/message-create-abl.js";
 import messageDeleteAbl from "../abl/message/message-delete-abl.js";
 import messageGetAbl from "../abl/message/message-get-abl.js";
-import messageUpdateAbl from "../abl/message/message-update-abl.js";
-
+//import messageUpdateAbl from "../abl/message/message-update-abl.js";
+import messageListAbl from "../abl/message/message-list-abl.js";
 export const messageController = {
   create: async (req, res, next) => {
     try {
-      const newMessage = req.body;
-      await messageCreateAbl(newMessage);
+      const data = req.body;
+      await messageCreateAbl(data);
       res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
@@ -25,17 +25,17 @@ export const messageController = {
   get: async (req, res, next) => {
     try {
       const id = req.params.id;
-      await messageGetAbl(id);
-      res.status(200).json({ status: "success" });
+      const message = await messageGetAbl(id);
+      res.status(200).json({ status: "success", data: message });
     } catch (error) {
       next(error);
     }
   },
-  update: async (req, res, next) => {
+  list: async (req, res, next) => {
     try {
-      const updatedMessage = req.body;
-      await messageUpdateAbl(updatedMessage);
-      res.status(200).json({ status: "success" });
+      const deviceId = req.params.deviceId;
+      const messages = await messageListAbl(deviceId);
+      res.status(200).json({ status: "success", data: messages });
     } catch (error) {
       next(error);
     }

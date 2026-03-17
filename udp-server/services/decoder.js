@@ -15,12 +15,11 @@ export const decodeMessage = async (msg) => {
 
     //STRUCTURE DATA
     const processedData = {
-      device_id: decodedRawData.device_id,
-      serialNumber: serialNumber,
+      serialNumber: serialNumber.toString(),
       in: decodedRawData.in || 0,
       out: decodedRawData.out || 0,
       battery: decodedRawData.battery || 0,
-      timestamp: new Date().toISOString(),
+      timestamp: decodedRawData.timestamp,
     };
     return processedData;
   } catch (error) {

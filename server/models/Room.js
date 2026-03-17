@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const roomSchema = new Schema(
   {
-    location_id: {
+    locationId: {
       type: Schema.Types.ObjectId,
       ref: "Location",
       required: true,

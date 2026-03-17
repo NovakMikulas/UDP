@@ -6,6 +6,7 @@ import deviceRoutes from "./routes/device-routes.js";
 import locationRoutes from "./routes/location-routes.js";
 import roomRoutes from "./routes/room-routes.js";
 import messageRoutes from "./routes/message-routes.js";
+import userRoutes from "./routes/user-routes.js";
 import globalErrorHandler from "./middleware/error-middleware.js";
 dotenv.config();
 
@@ -16,7 +17,7 @@ app.use("/api/device", deviceRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/message", messageRoutes);
-
+app.use("/auth", userRoutes);
 connectDatabase();
 
 app.get("/", (req, res) => {

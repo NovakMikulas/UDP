@@ -8,8 +8,8 @@ const schema = {
   type: "object",
   properties: {
     id: { type: "string" },
-    owner_id: { type: "string" },
-    authorized_users: { type: "array", items: { type: "string" } },
+    ownerId: { type: "string" },
+    authorizedUsers: { type: "array", items: { type: "string" } },
     name: { type: "string" },
     address: { type: "string" },
   },

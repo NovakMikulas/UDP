@@ -5,11 +5,10 @@ import ApiError from "../../utils/api-error.js";
 const schema = {
   type: "object",
   properties: {
-    room_id: { type: "string" },
-    serial_number: { type: "string" },
-    name: { type: "string" },
+    roomId: { type: "string" },
+    serialNumber: { type: "string" },
   },
-  required: ["name", "serial_number", "room_id"],
+  required: ["serialNumber", "roomId"],
 };
 
 async function deviceCreateAbl(data) {

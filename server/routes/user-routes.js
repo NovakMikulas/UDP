@@ -1,15 +1,13 @@
 import { userController } from "../controller/user-controller.js";
+import authMiddleware from "../middleware/auth/authenticate-middleware.js";
+
 import express from "express";
 const router = express.Router();
 
-router.post("/create", userController.create);
+router.post("/login", userController.login);
 
 //router.get("/list", authMiddleware, userController.list);
 
-router.get("/get/:id", userController.get);
-
-router.put("/update/:id", userController.update);
-
-router.delete("/delete/:id", userController.delete);
+router.post("/register", userController.register);
 
 export default router;

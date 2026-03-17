@@ -2,12 +2,15 @@ import locationCreateAbl from "../abl/location/location-create-abl.js";
 import locationDeleteAbl from "../abl/location/location-delete-abl.js";
 import locationGetAbl from "../abl/location/location-get-abl.js";
 import locationUpdateAbl from "../abl/location/location-update-abl.js";
-
+import locationListAbl from "../abl/location/location-list-abl.js";
 export const locationController = {
   create: async (req, res, next) => {
     try {
-      const newLocation = req.body;
-      await locationCreateAbl(newLocation);
+      const data = {
+        ...req.body,
+        ownerId: req.user.id,
+      };
+      await locationCreateAbl(data);
       res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
@@ -15,7 +18,7 @@ export const locationController = {
   },
   delete: async (req, res, next) => {
     try {
-      const id = req.body.id;
+      const id = req.params.locationId;
       await locationDeleteAbl(id);
       res.status(200).json({ status: "success" });
     } catch (error) {
@@ -24,18 +27,31 @@ export const locationController = {
   },
   get: async (req, res, next) => {
     try {
-      const id = req.params.id;
-      await locationGetAbl(id);
-      res.status(200).json({ status: "success" });
+      const id = req.params.locationId;
+      const location = await locationGetAbl(id);
+      res.status(200).json({ status: "success", data: location });
     } catch (error) {
       next(error);
     }
   },
   update: async (req, res, next) => {
     try {
-      const updatedLocation = req.body;
-      await locationUpdateAbl(updatedLocation);
-      res.status(200).json({ status: "success" });
+      const location = req.body;
+      const data = {
+        ...location,
+        id: req.params.locationId,
+      };
+      const updatedLocation = await locationUpdateAbl(data);
+      res.status(200).json({ status: "success", data: updatedLocation });
+    } catch (error) {
+      next(error);
+    }
+  },
+  list: async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const locations = await locationListAbl(userId);
+      res.status(200).json({ status: "success", data: locations });
     } catch (error) {
       next(error);
     }
