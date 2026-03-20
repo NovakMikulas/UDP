@@ -8,7 +8,7 @@ export const locationController = {
     try {
       const data = {
         ...req.body,
-        ownerId: req.user.id,
+        owner: req.user.id,
       };
       await locationCreateAbl(data);
       res.status(201).json({ status: "success" });

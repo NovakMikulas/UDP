@@ -29,7 +29,7 @@ const authorizeLocation = (allowedRoles) => {
 
       let userRole = null;
 
-      if (location.ownerId.toString() === userId) {
+      if (location.owner.toString() === userId) {
         userRole = "Owner";
       } else if (
         location.members &&
