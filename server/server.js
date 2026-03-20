@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDatabase from "./config/database.js";
 import deviceRoutes from "./routes/device-routes.js";
 import locationRoutes from "./routes/location-routes.js";
@@ -12,12 +13,18 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:5173", 
+    credentials: true, 
+  }),
+);
 app.use("/api/device", deviceRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/message", messageRoutes);
-app.use("/auth", userRoutes);
+app.use("/api/user", userRoutes);
 connectDatabase();
 
 app.get("/", (req, res) => {
