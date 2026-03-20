@@ -1,0 +1,44 @@
+.btn {
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn--primary {
+  background-color: var(--color-accent);
+  color: var(--color-bg-darker);
+}
+
+.btn--primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn--success {
+  background-color: var(--color-success);
+  color: #111;
+}
+
+.btn--success:hover {
+  background-color: var(--color-success-hover);
+}
+
+.btn--danger {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.btn--danger:hover {
+  background-color: var(--color-danger-hover);
+}
+
+.btn--full {
+  width: 100%;
+}

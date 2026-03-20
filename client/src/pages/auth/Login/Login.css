@@ -1,0 +1,62 @@
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-bg-darker);
+}
+
+.login-box {
+    background-color: var(--color-bg-dark);
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+    width: 320px;
+    max-width: 90%;
+}
+
+.login-form h1 {
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.error-banner {
+    background-color: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #ff4d4d;
+    margin-bottom: 20px;
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 25px;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.signup-link span {
+    color: var(--color-accent);
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.signup-link span:hover {
+    text-decoration: underline;
+}
