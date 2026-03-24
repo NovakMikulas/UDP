@@ -8,7 +8,7 @@
 
 .register-box {
     background-color: var(--color-bg-dark);
-    padding: 2.5rem;
+    padding: var(--spacing-xl);
     border-radius: var(--radius-md);
     width: 320px;
     max-width: 90%;
@@ -24,11 +24,11 @@
 }
 
 .error-banner {
-    background-color: rgba(255, 77, 77, 0.1);
-    color: #ff4d4d;
+    background-color: rgba(229, 62, 62, 0.1);
+    color: var(--color-danger);
     padding: 12px;
     border-radius: var(--radius-sm);
-    border: 1px solid #ff4d4d;
+    border: 1px solid var(--color-danger);
     margin-bottom: 20px;
     font-size: var(--text-sm);
     text-align: center;
@@ -55,7 +55,6 @@
 .signin-link span {
     color: var(--color-accent);
     cursor: pointer;
-    text-decoration: none;
     font-weight: 600;
 }
 

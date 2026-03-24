@@ -31,10 +31,6 @@ const Sidebar = () => {
       <nav className="sidebar-nav">
         <span className="sidebar-section-label">MAIN</span>
 
-        <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
-          <HomeIcon fontSize="small" /> Dashboard
-        </NavLink>
-
         <NavLink to="/locations" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
           <LocationOnIcon fontSize="small" /> Locations
         </NavLink>

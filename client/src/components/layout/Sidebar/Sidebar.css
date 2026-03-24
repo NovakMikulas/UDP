@@ -30,7 +30,6 @@
     justify-content: center;
     font-weight: 700;
     font-size: var(--text-base);
-    flex-shrink: 0;
 }
 
 .sidebar-user-info {
@@ -40,11 +39,10 @@
 }
 
 .sidebar-email {
-    font-size: 0.75rem;
+    font-size: var(--text-sm);
     color: var(--color-text-muted);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .sidebar-name {
@@ -53,7 +51,6 @@
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* Nav */
@@ -65,7 +62,7 @@
 }
 
 .sidebar-section-label {
-    font-size: 0.7rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-text-muted);
     letter-spacing: 0.08em;
@@ -113,6 +110,6 @@
 }
 
 .sidebar-logout:hover {
-    background-color: rgba(229, 62, 62, 0.1);
+    background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
     color: var(--color-danger);
 }

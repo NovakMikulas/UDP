@@ -11,13 +11,10 @@ body {
     --color-text-primary: #E7E6E3;
     --color-text-muted: #757575;
     --color-accent: #a885f8;
-    --color-accent-hover: #9060f0;
     --color-bg-dark: #111111;
     --color-bg-darker: #0A0A0A;
-    --color-success: #a3e635;
-    --color-success-hover: #84cc16;
-    --color-danger: #e53e3e;
-    --color-danger-hover: #c53030;
+    --color-success: #4caf50;
+    --color-danger: #b2102f;
 
     /* Spacing */
     --spacing-sm: 0.5rem;

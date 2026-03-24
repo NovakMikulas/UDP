@@ -1,17 +1,1 @@
-.room-list__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--spacing-lg);
-}
-
-.room-list__header h1 {
-  font-size: var(--text-xl);
-  font-weight: 600;
-}
-
-.room-list__error {
-  color: var(--color-error);
-  font-size: var(--text-sm);
-  margin-bottom: var(--spacing-md);
-}
+/* RoomList uses shared .table-view styles from Table.css */

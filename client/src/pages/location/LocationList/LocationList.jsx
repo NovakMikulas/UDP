@@ -7,6 +7,10 @@ import Input from "../../../components/ui/Input/Input";
 import Table from "../../../components/ui/Table/Table";
 import Modal from "../../../components/ui/Modal/Modal";
 import AddIcon from "@mui/icons-material/Add";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
+import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import "./LocationList.css";
 
 const columns = [
@@ -49,9 +53,18 @@ const LocationList = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: "", address: "" });
-  const [formError, setFormError] = useState("");
+
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ name: "", address: "" });
+  const [addError, setAddError] = useState("");
+
+  const [updateOpen, setUpdateOpen] = useState(false);
+  const [updateForm, setUpdateForm] = useState({ name: "", address: "" });
+  const [updateError, setUpdateError] = useState("");
+  const [selected, setSelected] = useState(null);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const fetchLocations = async () => {
     try {
@@ -68,34 +81,86 @@ const LocationList = () => {
     fetchLocations();
   }, []);
 
-  const handleChange = (e) => {
+  const handleAddChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setAddForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    setFormError("");
+    setAddError("");
     try {
-      await locationService.create(formData);
-      setModalOpen(false);
-      setFormData({ name: "", address: "" });
+      await locationService.create(addForm);
+      setAddOpen(false);
+      setAddForm({ name: "", address: "" });
       fetchLocations();
     } catch (err) {
-      setFormError(err.response?.data?.message || "Failed to create location.");
+      setAddError(err.response?.data?.message || "Failed to create location.");
+    }
+  };
+
+  const openUpdate = (loc) => {
+    setSelected(loc);
+    setUpdateForm({ name: loc.name, address: loc.address });
+    setUpdateError("");
+    setUpdateOpen(true);
+  };
+
+  const handleUpdateChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setUpdateError("");
+    try {
+      await locationService.update(selected._id, updateForm);
+      setUpdateOpen(false);
+      setSelected(null);
+      fetchLocations();
+    } catch (err) {
+      setUpdateError(err.response?.data?.message || "Failed to update location.");
+    }
+  };
+
+  const openDelete = (loc) => {
+    setSelected(loc);
+    setDeleteError("");
+    setDeleteOpen(true);
+  };
+
+  const handleDelete = async () => {
+    setDeleteError("");
+    try {
+      await locationService.delete(selected._id);
+      setDeleteOpen(false);
+      setSelected(null);
+      fetchLocations();
+    } catch (err) {
+      setDeleteError(err.response?.data?.message || "Failed to delete location.");
     }
   };
 
   const getMenuItems = (loc) => {
     const isOwner = loc.owner?._id === user?.id;
     const items = [
-      { label: "Update", onClick: () => console.log("update", loc) },
-      { label: "Delete", onClick: () => console.log("delete", loc), variant: "danger" },
+      {
+        label: "Update",
+        icon: <EditOutlinedIcon fontSize="small" />,
+        onClick: () => openUpdate(loc),
+      },
+      {
+        label: "Delete",
+        icon: <DeleteOutlineIcon fontSize="small" />,
+        onClick: () => openDelete(loc),
+        variant: "danger",
+      },
     ];
     if (isOwner) {
       items.push(
-        { label: "Invite user", onClick: () => console.log("invite", loc) },
-        { label: "Kick user", onClick: () => console.log("kick", loc), variant: "danger" },
+        { label: "Invite user", icon: <PersonAddOutlinedIcon fontSize="small" />, onClick: () => console.log("invite", loc) },
+        { label: "Kick user", icon: <PersonRemoveOutlinedIcon fontSize="small" />, onClick: () => console.log("kick", loc), variant: "danger" },
       );
     }
     return items;
@@ -105,7 +170,7 @@ const LocationList = () => {
     <div className="table-view">
       <div className="table-view__header">
         <h1>Locations</h1>
-        <Button variant="success" onClick={() => setModalOpen(true)}>
+        <Button variant="success" onClick={() => setAddOpen(true)}>
           <AddIcon fontSize="small" /> Add location
         </Button>
       </div>
@@ -121,13 +186,35 @@ const LocationList = () => {
         getMenuItems={getMenuItems}
       />
 
-      <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Add location">
+      <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Add location">
         <form onSubmit={handleAdd} className="modal-form">
-          {formError && <div className="modal-form__error">{formError}</div>}
-          <Input id="name" label="Name" value={formData.name} onChange={handleChange} required />
-          <Input id="address" label="Address" value={formData.address} onChange={handleChange} required />
+          {addError && <div className="modal-form__error">{addError}</div>}
+          <Input id="name" label="Name" value={addForm.name} onChange={handleAddChange} required />
+          <Input id="address" label="Address" value={addForm.address} onChange={handleAddChange} required />
           <Button type="submit" variant="success" fullWidth>Create</Button>
         </form>
+      </Modal>
+
+      <Modal isOpen={updateOpen} onClose={() => setUpdateOpen(false)} title="Update location">
+        <form onSubmit={handleUpdate} className="modal-form">
+          {updateError && <div className="modal-form__error">{updateError}</div>}
+          <Input id="name" label="Name" value={updateForm.name} onChange={handleUpdateChange} required />
+          <Input id="address" label="Address" value={updateForm.address} onChange={handleUpdateChange} required />
+          <Button type="submit" variant="success" fullWidth>Save changes</Button>
+        </form>
+      </Modal>
+
+      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Delete location">
+        <div className="modal-form">
+          {deleteError && <div className="modal-form__error">{deleteError}</div>}
+          <p className="modal-confirm__text">
+            Are you sure you want to delete <strong>{selected?.name}</strong>? This action cannot be undone.
+          </p>
+          <div className="modal-confirm__actions">
+            <Button variant="primary" fullWidth onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button variant="danger" fullWidth onClick={handleDelete}>Delete</Button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

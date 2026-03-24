@@ -2,8 +2,7 @@
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background-color: var(--color-bg-dark);
   border-radius: var(--radius-sm);
   min-width: 150px;
   z-index: 100;
@@ -11,8 +10,15 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+.action-menu__icon {
+  display: flex;
+  align-items: center;
+}
+
 .action-menu__item {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   width: 100%;
   padding: 10px var(--spacing-md);
   background: none;
@@ -25,7 +31,7 @@
 }
 
 .action-menu__item:hover {
-  background-color: #222;
+  background-color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
 }
 
 .action-menu__item--danger {
@@ -33,5 +39,5 @@
 }
 
 .action-menu__item--danger:hover {
-  background-color: rgba(229, 62, 62, 0.1);
+  background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }

@@ -2,7 +2,7 @@
   padding: 14px 20px;
   border: none;
   border-radius: var(--radius-sm);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -18,25 +18,25 @@
 }
 
 .btn--primary:hover {
-  background-color: var(--color-accent-hover);
+  background-color: color-mix(in srgb, var(--color-accent) 85%, transparent);
 }
 
 .btn--success {
   background-color: var(--color-success);
-  color: #111;
+  color: var(--color-bg-dark);
 }
 
 .btn--success:hover {
-  background-color: var(--color-success-hover);
+  background-color: color-mix(in srgb, var(--color-success) 85%, transparent);
 }
 
 .btn--danger {
   background-color: var(--color-danger);
-  color: white;
+  color: var(--color-text-primary);
 }
 
 .btn--danger:hover {
-  background-color: var(--color-danger-hover);
+  background-color: color-mix(in srgb, var(--color-danger) 85%, transparent);
 }
 
 .btn--full {
