@@ -49,3 +49,14 @@
 .modal-body {
   padding: var(--spacing-lg) var(--spacing-xl);
 }
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.modal-form__error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}

@@ -1,0 +1,102 @@
+.table-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.table-view__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-view__header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.table-view__error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+.ui-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ui-table th {
+  text-align: left;
+  padding: 10px var(--spacing-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid #222;
+}
+
+.ui-table td {
+  padding: 14px var(--spacing-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid #1a1a1a;
+  vertical-align: middle;
+}
+
+.ui-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ui-table__actions {
+  width: 36px;
+  text-align: right;
+}
+
+.ui-table__row--clickable {
+  cursor: pointer;
+}
+
+.ui-table__row--clickable:hover td {
+  background-color: #1a1a1a;
+}
+
+.ui-table__empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: var(--spacing-xl) !important;
+}
+
+/* Shared cell helpers used across all table pages */
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.icon-btn:hover {
+  background-color: #222;
+  color: var(--color-text-primary);
+}
+
+.table-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  color: var(--color-bg-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid var(--color-bg-darker);
+}

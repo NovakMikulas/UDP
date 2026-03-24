@@ -5,6 +5,8 @@ import AppLayout from "./components/layout/AppLayout/AppLayout";
 import Login from "./pages/auth/Login/Login.jsx";
 import Register from "./pages/auth/Register/Register.jsx";
 import LocationList from "./pages/location/LocationList/LocationList.jsx";
+import RoomList from "./pages/room/RoomList/RoomList.jsx";
+import DeviceList from "./pages/device/DeviceList.jsx";
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/locations" element={<LocationList />} />
+              <Route path="/locations/:locationId/rooms" element={<RoomList />} />
+              <Route path="/locations/:locationId/rooms/:roomId/devices" element={<DeviceList />} />
             </Route>
           </Route>
 

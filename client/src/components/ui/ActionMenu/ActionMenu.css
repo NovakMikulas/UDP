@@ -1,0 +1,37 @@
+.action-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: var(--radius-sm);
+  min-width: 150px;
+  z-index: 100;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.action-menu__item {
+  display: block;
+  width: 100%;
+  padding: 10px var(--spacing-md);
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.action-menu__item:hover {
+  background-color: #222;
+}
+
+.action-menu__item--danger {
+  color: var(--color-danger);
+}
+
+.action-menu__item--danger:hover {
+  background-color: rgba(229, 62, 62, 0.1);
+}

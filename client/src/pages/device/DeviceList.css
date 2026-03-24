@@ -1,0 +1,12 @@
+.device-serial {
+  color: var(--color-accent);
+  font-family: monospace;
+}
+
+.status-icon--active {
+  color: var(--color-success);
+}
+
+.status-icon--inactive {
+  color: var(--color-danger);
+}
