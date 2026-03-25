@@ -5,7 +5,7 @@ import "./AppLayout.css";
 const AppLayout = () => (
   <div className="app-layout">
     <Sidebar />
-    <main className="app-main">
+    <main>
       <Outlet />
     </main>
   </div>

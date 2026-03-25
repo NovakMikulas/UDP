@@ -26,6 +26,14 @@ router.delete(
   authorizeMiddleware(["Owner"]),
   locationController.delete,
 );
+
 router.get("/list", authMiddleware, locationController.list);
+
+router.post(
+  "/invite/:userId",
+  authMiddleware,
+  authorizeMiddleware(["Owner", "Member"]),
+  locationController.invite,
+);
 
 export default router;

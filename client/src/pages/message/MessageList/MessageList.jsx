@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { messageService } from "../../../api/services/message";
 import Table from "../../../components/ui/Table/Table";
+import Breadcrumb from "../../../components/ui/Breadcrumb/Breadcrumb";
 import "./MessageList.css";
 
 const columns = [
@@ -24,7 +25,11 @@ const columns = [
 ];
 
 const MessageList = () => {
-  const { deviceId, locationId } = useParams();
+  const { deviceId, locationId, roomId } = useParams();
+  const { state } = useLocation();
+  const locationName = state?.locationName || locationId;
+  const roomName = state?.roomName || roomId;
+  const deviceSerial = state?.deviceSerial || deviceId;
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,6 +45,12 @@ const MessageList = () => {
 
   return (
     <div className="table-view">
+      <Breadcrumb items={[
+        { label: "Locations", path: "/locations" },
+        { label: locationName, path: `/locations/${locationId}/rooms`, state: { locationName } },
+        { label: roomName, path: `/locations/${locationId}/rooms/${roomId}/devices`, state: { locationName, roomName } },
+        { label: deviceSerial },
+      ]} />
       <div className="table-view__header">
         <h1>Messages</h1>
       </div>

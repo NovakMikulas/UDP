@@ -4,7 +4,7 @@
     background-color: var(--color-bg-darker);
 }
 
-.app-main {
+.app-layout > main {
     flex: 1;
     padding: var(--spacing-xl);
     overflow-y: auto;

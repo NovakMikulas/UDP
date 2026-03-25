@@ -29,7 +29,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="sidebar-nav">
-        <span className="sidebar-section-label">MAIN</span>
+        <span>MAIN</span>
 
         <NavLink to="/locations" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
           <LocationOnIcon fontSize="small" /> Locations
