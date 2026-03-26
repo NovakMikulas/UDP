@@ -21,8 +21,8 @@ const columns = [
   {
     header: "Status",
     render: (device) => device.status === "active"
-      ? <CheckCircleOutlineIcon className="status-icon status-icon--active" fontSize="small" />
-      : <CancelOutlinedIcon className="status-icon status-icon--inactive" fontSize="small" />,
+      ? <CheckCircleOutlineIcon className="status-icon status-icon-active" fontSize="small" />
+      : <CancelOutlinedIcon className="status-icon status-icon-inactive" fontSize="small" />,
   },
 ];
 

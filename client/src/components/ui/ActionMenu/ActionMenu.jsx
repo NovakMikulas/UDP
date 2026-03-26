@@ -19,7 +19,7 @@ const ActionMenu = ({ items, onClose, anchorEl }) => {
       {items.map((item, i) => (
         <button
           key={i}
-          className={`action-menu__item${item.variant ? ` action-menu__item--${item.variant}` : ""}`}
+          className={`action-menu__item${item.variant ? ` action-menu__item-${item.variant}` : ""}`}
           onClick={(e) => { e.stopPropagation(); item.onClick(); onClose(); }}
         >
           {item.icon && <span className="action-menu__icon">{item.icon}</span>}

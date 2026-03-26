@@ -41,9 +41,7 @@ const Sidebar = () => {
       </nav>
 
       <div className="sidebar-bottom">
-        <button className="sidebar-link">
-          <HelpIcon fontSize="small" /> Help
-        </button>
+       
         <button className="sidebar-link sidebar-logout" onClick={handleLogout}>
           <LogoutIcon fontSize="small" /> Logout Account
         </button>

@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -9,6 +10,7 @@ import roomRoutes from "./routes/room-routes.js";
 import messageRoutes from "./routes/message-routes.js";
 import userRoutes from "./routes/user-routes.js";
 import globalErrorHandler from "./middleware/error-middleware.js";
+import { initSocket } from "./socket/index.js";
 dotenv.config();
 
 const app = express();
@@ -32,8 +34,10 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
+const httpServer = createServer(app);
+initSocket(httpServer);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`Server is running on port: ${PORT}`);
 });
 

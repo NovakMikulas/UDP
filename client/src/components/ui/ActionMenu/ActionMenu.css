@@ -34,10 +34,10 @@
   background-color: color-mix(in srgb, var(--color-text-primary) 10%, transparent);
 }
 
-.action-menu__item--danger {
+.action-menu__item-danger {
   color: var(--color-danger);
 }
 
-.action-menu__item--danger:hover {
+.action-menu__item-danger:hover {
   background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }

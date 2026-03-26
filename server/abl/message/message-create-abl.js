@@ -4,7 +4,9 @@ const ajv = new Ajv();
 addFormats(ajv);
 import messageCreateDao from "../../dao/message/message-create-dao.js";
 import deviceGetBySerialDao from "../../dao/device/device-getBySerial-dao.js";
+import roomGetDao from "../../dao/room/room-get-dao.js";
 import ApiError from "../../utils/api-error.js";
+import { emitToLocation } from "../../socket/sender.js";
 const schema = {
   type: "object",
   properties: {
@@ -35,7 +37,14 @@ async function messageCreateAbl(data) {
     ...data,
     deviceId: device._id,
   };
-  return await messageCreateDao(processedData);
+  const message = await messageCreateDao(processedData);
+
+  const room = await roomGetDao(device.roomId);
+  if (room) {
+    emitToLocation(room.locationId, "new_message", message);
+  }
+
+  return message;
 }
 
 export default messageCreateAbl;

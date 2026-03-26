@@ -63,8 +63,8 @@
 }
 
 .sidebar-nav > span {
-    font-size: var(--text-sm);
     font-weight: 600;
+    font-size: 0.7rem;
     color: var(--color-text-muted);
     letter-spacing: 0.08em;
     margin-bottom: var(--spacing-sm);
