@@ -1,0 +1,79 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--color-bg-dark);
+  border-radius: var(--radius-md);
+  width: 480px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+}
+
+.modal-header > h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-text-primary);
+}
+
+.modal-header > button {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-header > button:hover {
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: var(--spacing-lg) var(--spacing-xl);
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.modal-form__error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+}
+
+.modal-form > p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  line-height: 1.5;
+}
+
+.modal-form > p strong {
+  color: var(--color-text-primary);
+}
+
+.modal-form > div:last-child {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}

@@ -3,12 +3,14 @@ import locationDeleteAbl from "../abl/location/location-delete-abl.js";
 import locationGetAbl from "../abl/location/location-get-abl.js";
 import locationUpdateAbl from "../abl/location/location-update-abl.js";
 import locationListAbl from "../abl/location/location-list-abl.js";
+import locationInviteUserAbl from "../abl/location/location-inviteUser-abl.js";
+
 export const locationController = {
   create: async (req, res, next) => {
     try {
       const data = {
         ...req.body,
-        ownerId: req.user.id,
+        owner: req.user.id,
       };
       await locationCreateAbl(data);
       res.status(201).json({ status: "success" });
@@ -52,6 +54,15 @@ export const locationController = {
       const userId = req.user.id;
       const locations = await locationListAbl(userId);
       res.status(200).json({ status: "success", data: locations });
+    } catch (error) {
+      next(error);
+    }
+  },
+  invite: async (req, res, next) => {
+    try {
+      const data = req.body;
+      await locationInviteUserAbl(data);
+      res.status(201).json({ status: "success" });
     } catch (error) {
       next(error);
     }

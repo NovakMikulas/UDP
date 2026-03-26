@@ -46,7 +46,10 @@ async function userLoginAbl(data) {
     process.env.JWT_SECRET || "123",
     { expiresIn: "1h" },
   );
-  return { token };
+  return {
+    token,
+    user: { id: user._id, email: user.email, username: user.username },
+  };
 }
 
 export default userLoginAbl;

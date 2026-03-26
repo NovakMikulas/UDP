@@ -1,0 +1,18 @@
+.owner-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.members-cell {
+  display: flex;
+  align-items: center;
+}
+
+.members-cell .table-avatar {
+  margin-left: -6px;
+}
+
+.members-cell .table-avatar:first-child {
+  margin-left: 0;
+}

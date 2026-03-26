@@ -1,0 +1,63 @@
+.register-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--color-bg-darker);
+}
+
+.register-box {
+    background-color: var(--color-bg-dark);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    width: 320px;
+    max-width: 90%;
+}
+
+.register-form h1 {
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: var(--text-lg);
+    font-weight: 700;
+}
+
+.error-banner {
+    background-color: rgba(229, 62, 62, 0.1);
+    color: var(--color-danger);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-danger);
+    margin-bottom: 20px;
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.success-banner {
+    background-color: rgba(163, 230, 53, 0.1);
+    color: var(--color-success);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-success);
+    margin-bottom: 20px;
+    font-size: var(--text-sm);
+    text-align: center;
+}
+
+.signin-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.signin-link span {
+    color: var(--color-accent);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.signin-link span:hover {
+    text-decoration: underline;
+}
