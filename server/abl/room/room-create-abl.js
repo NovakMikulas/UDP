@@ -7,7 +7,7 @@ const schema = {
   properties: {
     locationId: { type: "string" },
     name: { type: "string" },
-    capacity: { type: "number" },
+    capacity: { type: "number", minimum: 1 },
   },
   required: ["name", "locationId", "capacity"],
 };

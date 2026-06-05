@@ -1,17 +1,11 @@
-import crypto from 'crypto';
+import bcrypt from "bcrypt";
 
-export function hashPassword(password) {
-    const salt = crypto.randomBytes(16).toString('hex');
-    const hash = crypto.createHash('sha256')
-        .update(salt + password)
-        .digest('hex');
-    return `${salt}.${hash}`;
+const SALT_ROUNDS = 12;
+
+export async function hashPassword(password) {
+  return await bcrypt.hash(password, SALT_ROUNDS);
 }
 
-export function verifyPassword(password, storedValue) {
-    const [salt, originalHash] = storedValue.split('.');
-    const newHash = crypto.createHash('sha256')
-        .update(salt + password)
-        .digest('hex');
-    return newHash === originalHash;
+export async function verifyPassword(password, storedHash) {
+  return await bcrypt.compare(password, storedHash);
 }

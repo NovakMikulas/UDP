@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import Room from "./Room.js";
 
 const locationSchema = new Schema(
   {
@@ -9,5 +10,15 @@ const locationSchema = new Schema(
   },
   { timestamps: true },
 );
+
+locationSchema.pre("deleteOne", { document: false, query: true }, async function () {
+  const location = await this.model.findOne(this.getFilter());
+  if (location) {
+    const rooms = await Room.find({ locationId: location._id }, "_id");
+    for (const room of rooms) {
+      await Room.deleteOne({ _id: room._id });
+    }
+  }
+});
 
 export default model("Location", locationSchema);

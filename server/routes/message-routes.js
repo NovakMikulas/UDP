@@ -21,11 +21,4 @@ router.get(
   messageController.get,
 );
 
-router.delete(
-  "/delete/:id",
-  authMiddleware,
-  authorizeMiddleware(["Owner"]),
-  messageController.delete,
-);
-
 export default router;

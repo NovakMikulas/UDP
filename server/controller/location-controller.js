@@ -60,9 +60,12 @@ export const locationController = {
   },
   invite: async (req, res, next) => {
     try {
-      const data = req.body;
+      const data = {
+        id: req.params.locationId,
+        email: req.body.email,
+      };
       await locationInviteUserAbl(data);
-      res.status(201).json({ status: "success" });
+      res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);
     }
