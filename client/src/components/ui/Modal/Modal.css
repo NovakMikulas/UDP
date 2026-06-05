@@ -1,7 +1,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,12 +9,14 @@
 }
 
 .modal {
-  background-color: var(--color-bg-dark);
+  background-color: var(--color-bg);
   border-radius: var(--radius-md);
   width: 480px;
   max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--color-border);
 }
 
 .modal-header {
@@ -22,13 +24,14 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-lg) var(--spacing-xl);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-text-primary) 8%, transparent);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header > h2 {
   margin: 0;
   font-size: var(--text-lg);
   color: var(--color-text-primary);
+  font-weight: 700;
 }
 
 .modal-header > button {
@@ -39,7 +42,7 @@
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .modal-header > button:hover {

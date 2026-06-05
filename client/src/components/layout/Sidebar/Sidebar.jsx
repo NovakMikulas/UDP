@@ -1,9 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
-import HomeIcon from "@mui/icons-material/Home";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DeviceHubIcon from "@mui/icons-material/DeviceHub";
-import HelpIcon from "@mui/icons-material/Help";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import LogoutIcon from "@mui/icons-material/Logout";
 import "./Sidebar.css";
 
@@ -29,7 +29,7 @@ const Sidebar = () => {
       </div>
 
       <nav className="sidebar-nav">
-        <span>MAIN</span>
+        <span className="sidebar-section-label">MAIN</span>
 
         <NavLink to="/locations" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
           <LocationOnIcon fontSize="small" /> Locations
@@ -38,10 +38,19 @@ const Sidebar = () => {
         <NavLink to="/devices" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
           <DeviceHubIcon fontSize="small" /> Devices
         </NavLink>
+
+        <span className="sidebar-section-label">ADMINISTRATION</span>
+
+        <NavLink to="/notifications" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
+          <NotificationsNoneIcon fontSize="small" /> Notifications
+        </NavLink>
+
+        <NavLink to="/settings" className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
+          <SettingsOutlinedIcon fontSize="small" /> Settings
+        </NavLink>
       </nav>
 
       <div className="sidebar-bottom">
-       
         <button className="sidebar-link sidebar-logout" onClick={handleLogout}>
           <LogoutIcon fontSize="small" /> Logout Account
         </button>

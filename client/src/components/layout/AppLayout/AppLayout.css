@@ -1,11 +1,15 @@
 .app-layout {
-    display: flex;
-    min-height: 100vh;
-    background-color: var(--color-bg-darker);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .app-layout > main {
-    flex: 1;
-    padding: var(--spacing-xl);
-    overflow-y: auto;
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-xl);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
