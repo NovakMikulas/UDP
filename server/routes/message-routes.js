@@ -15,7 +15,7 @@ router.get(
 );
 
 router.get(
-  "/get/:id",
+  "/get/:messageId",
   authMiddleware,
   authorizeMiddleware(["Owner", "Member"]),
   messageController.get,

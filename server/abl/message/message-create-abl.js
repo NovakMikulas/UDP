@@ -11,9 +11,9 @@ const schema = {
   type: "object",
   properties: {
     serialNumber: { type: "string" },
-    in: { type: "number" },
-    out: { type: "number" },
-    battery: { type: "number" },
+    in: { type: "number", minimum: 0 },
+    out: { type: "number", minimum: 0 },
+    battery: { type: "number", minimum: 0, maximum: 100 },
   },
   required: ["serialNumber", "in", "out", "battery"],
 };

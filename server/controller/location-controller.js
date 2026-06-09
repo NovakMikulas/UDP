@@ -12,8 +12,8 @@ export const locationController = {
         ...req.body,
         owner: req.user.id,
       };
-      await locationCreateAbl(data);
-      res.status(201).json({ status: "success" });
+      const newLocation = await locationCreateAbl(data);
+      res.status(201).json({ status: "success", data: newLocation });
     } catch (error) {
       next(error);
     }

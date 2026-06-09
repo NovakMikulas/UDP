@@ -30,9 +30,9 @@ router.delete(
 router.get("/list", authMiddleware, locationController.list);
 
 router.post(
-  "/:locationId/invite",
+  "/invite/:locationId",
   authMiddleware,
-  authorizeMiddleware(["Owner"]),
+  authorizeMiddleware(["Owner", "Member"]),
   locationController.invite,
 );
 

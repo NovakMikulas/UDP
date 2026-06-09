@@ -14,7 +14,7 @@ export const messageController = {
   },
   get: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.messageId;
       const message = await messageGetAbl(id);
       res.status(200).json({ status: "success", data: message });
     } catch (error) {
@@ -23,9 +23,15 @@ export const messageController = {
   },
   list: async (req, res, next) => {
     try {
-      const deviceId = req.params.deviceId;
-      const messages = await messageListAbl(deviceId);
-      res.status(200).json({ status: "success", data: messages });
+      const data = { deviceId: req.params.deviceId };
+      if (req.query.page !== undefined) data.page = Number(req.query.page);
+      if (req.query.limit !== undefined) data.limit = Number(req.query.limit);
+      const { items, page, limit, total, totalPages } = await messageListAbl(data);
+      res.status(200).json({
+        status: "success",
+        data: items,
+        pagination: { page, limit, total, totalPages },
+      });
     } catch (error) {
       next(error);
     }
