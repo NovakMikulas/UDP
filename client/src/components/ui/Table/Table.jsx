@@ -3,14 +3,14 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ActionMenu from "../ActionMenu/ActionMenu";
 import "./Table.css";
 
-const Table = ({ columns, data, emptyMessage = "No data found.", onRowClick, loading, getMenuItems }) => {
+const Table = ({ columns, data, emptyMessage = "No data found.", onRowClick, loading, getMenuItems, onScroll, footer }) => {
   const [openRowId, setOpenRowId] = useState(null);
   const anchorRefs = useRef({});
   const colSpan = columns.length + (getMenuItems ? 1 : 0);
 
   return (
     <div className="table-wrapper">
-      <div className="table-scroll">
+      <div className="table-scroll" onScroll={onScroll}>
         <table className="ui-table">
           <thead>
             <tr>
@@ -62,6 +62,14 @@ const Table = ({ columns, data, emptyMessage = "No data found.", onRowClick, loa
               <tr>
                 <td colSpan={colSpan} className="ui-table__empty">
                   {emptyMessage}
+                </td>
+              </tr>
+            )}
+
+            {!loading && footer && (
+              <tr>
+                <td colSpan={colSpan} className="ui-table__footer">
+                  {footer}
                 </td>
               </tr>
             )}

@@ -24,8 +24,12 @@ const LocationList = () => {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [addForm, setAddForm] = useState({ name: "", address: "" });
-  const [updateForm, setUpdateForm] = useState({ name: "", address: "" });
+  const emptyAddress = { street: "", city: "", zip: "", country: "" };
+  const [addForm, setAddForm] = useState({ name: "", address: emptyAddress });
+  const [updateForm, setUpdateForm] = useState({ name: "", address: emptyAddress });
+
+  const formatAddress = (address) =>
+    address ? [address.street, address.city, address.zip, address.country].filter(Boolean).join(", ") : "";
 
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
           deleteOpen, openAdd, openUpdate, openDelete, closeAll } = useCrudModal();
@@ -46,7 +50,7 @@ const LocationList = () => {
   const filtered = locations.filter(
     (loc) =>
       loc.name.toLowerCase().includes(search.toLowerCase()) ||
-      loc.address.toLowerCase().includes(search.toLowerCase())
+      formatAddress(loc.address).toLowerCase().includes(search.toLowerCase())
   );
 
   const handleAddChange = (e) => {
@@ -54,12 +58,17 @@ const LocationList = () => {
     setAddForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAddAddressChange = (e) => {
+    const { name, value } = e.target;
+    setAddForm((prev) => ({ ...prev, address: { ...prev.address, [name]: value } }));
+  };
+
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
       await locationService.create(addForm);
       setAddOpen(false);
-      setAddForm({ name: "", address: "" });
+      setAddForm({ name: "", address: emptyAddress });
       fetchLocations();
       addToast("Location created successfully.", "success");
     } catch (err) {
@@ -72,8 +81,13 @@ const LocationList = () => {
     setUpdateForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleUpdateAddressChange = (e) => {
+    const { name, value } = e.target;
+    setUpdateForm((prev) => ({ ...prev, address: { ...prev.address, [name]: value } }));
+  };
+
   const handleOpenUpdate = (loc) => {
-    setUpdateForm({ name: loc.name, address: loc.address });
+    setUpdateForm({ name: loc.name, address: loc.address || emptyAddress });
     openUpdate(loc);
   };
 
@@ -161,7 +175,7 @@ const LocationList = () => {
                       ),
                     },
                   ]}
-                  footerLeft={loc.address}
+                  footerLeft={formatAddress(loc.address)}
                   onClick={() => navigate(`/locations/${loc._id}/rooms`, { state: { locationName: loc.name } })}
                   getMenuItems={() => getMenuItems(loc)}
                 />
@@ -175,7 +189,10 @@ const LocationList = () => {
       <Modal isOpen={addOpen} onClose={closeAll} title="Add location">
         <form onSubmit={handleAdd} className="modal-form">
           <Input id="name" label="Name" value={addForm.name} onChange={handleAddChange} required />
-          <Input id="address" label="Address" value={addForm.address} onChange={handleAddChange} required />
+          <Input id="street" label="Street" value={addForm.address.street} onChange={handleAddAddressChange} required />
+          <Input id="city" label="City" value={addForm.address.city} onChange={handleAddAddressChange} required />
+          <Input id="zip" label="ZIP" value={addForm.address.zip} onChange={handleAddAddressChange} required />
+          <Input id="country" label="Country" value={addForm.address.country} onChange={handleAddAddressChange} required />
           <Button type="submit" variant="success" fullWidth>Create</Button>
         </form>
       </Modal>
@@ -183,7 +200,10 @@ const LocationList = () => {
       <Modal isOpen={updateOpen} onClose={closeAll} title="Update location">
         <form onSubmit={handleUpdate} className="modal-form">
           <Input id="name" label="Name" value={updateForm.name} onChange={handleUpdateChange} required />
-          <Input id="address" label="Address" value={updateForm.address} onChange={handleUpdateChange} required />
+          <Input id="street" label="Street" value={updateForm.address.street} onChange={handleUpdateAddressChange} required />
+          <Input id="city" label="City" value={updateForm.address.city} onChange={handleUpdateAddressChange} required />
+          <Input id="zip" label="ZIP" value={updateForm.address.zip} onChange={handleUpdateAddressChange} required />
+          <Input id="country" label="Country" value={updateForm.address.country} onChange={handleUpdateAddressChange} required />
           <Button type="submit" variant="success" fullWidth>Save changes</Button>
         </form>
       </Modal>

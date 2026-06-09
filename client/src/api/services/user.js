@@ -6,7 +6,7 @@ export const userService = {
     return response.data;
   },
   changePassword: async (data) => {
-    const response = await api.put("/user/change-password", data);
+    const response = await api.put("/user/changePassword", data);
     return response.data;
   },
 };

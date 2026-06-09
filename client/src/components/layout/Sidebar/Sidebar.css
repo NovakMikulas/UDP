@@ -11,6 +11,45 @@
   top: 0;
 }
 
+.sidebar-close {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .sidebar--open {
+    transform: translateX(0);
+  }
+
+  .sidebar-close {
+    display: flex;
+    align-self: flex-end;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--spacing-md);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  .sidebar-close:hover {
+    background-color: var(--color-hover);
+    color: var(--color-text-primary);
+  }
+}
+
 .sidebar-user {
   display: flex;
   align-items: center;

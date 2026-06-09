@@ -64,6 +64,20 @@
   flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+  .table-view__toolbar {
+    justify-content: flex-start;
+  }
+
+  .table-view__search {
+    flex: 1;
+  }
+
+  .table-view__search input {
+    width: 100%;
+  }
+}
+
 /* Table wrapper — fills remaining space */
 .table-wrapper {
   flex: 1;
@@ -133,39 +147,13 @@
   padding: var(--spacing-xl) !important;
 }
 
-/* Shared card-grid layout (Location, Device, Room pages) */
-.card-grid-wrapper {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background-color: var(--color-bg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-}
-
-.card-grid-scroll {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-  padding: var(--spacing-md);
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--spacing-md);
-}
-
-.card-grid__empty {
-  grid-column: 1 / -1;
+.ui-table__footer {
   text-align: center;
   color: var(--color-text-muted);
-  padding: var(--spacing-xl) 0;
-  margin: 0;
+  font-size: var(--text-sm);
+  padding: var(--spacing-md) !important;
 }
+
 
 /* Shared helpers */
 .icon-btn {

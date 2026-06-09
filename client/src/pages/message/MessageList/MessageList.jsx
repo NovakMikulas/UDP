@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { messageService } from "../../../api/services/message";
 import { useToast } from "../../../context/ToastContext";
@@ -6,6 +6,9 @@ import socket from "../../../api/socket";
 import Table from "../../../components/ui/Table/Table";
 import Breadcrumb from "../../../components/ui/Breadcrumb/Breadcrumb";
 import "./MessageList.css";
+
+const PAGE_SIZE = 20;
+const SCROLL_THRESHOLD = 120;
 
 const columns = [
   { header: "Time",    render: (msg) => new Date(msg.createdAt).toLocaleString() },
@@ -23,15 +26,35 @@ const MessageList = () => {
   const { addToast } = useToast();
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const pageRef = useRef(1);
+
+  const loadPage = (page, append) =>
+    messageService.list(deviceId, locationId, page, PAGE_SIZE).then((data) => {
+      pageRef.current = page;
+      setMessages((prev) => (append ? [...prev, ...(data.data || [])] : data.data || []));
+      setHasMore(Boolean(data.pagination && data.pagination.page < data.pagination.totalPages));
+    });
 
   useEffect(() => {
     if (!deviceId || !locationId) return;
-    messageService
-      .list(deviceId, locationId)
-      .then((data) => setMessages(data.data || []))
+    setLoading(true);
+    pageRef.current = 1;
+    loadPage(1, false)
       .catch(() => addToast("Failed to load messages.", "error"))
       .finally(() => setLoading(false));
   }, [deviceId, locationId]);
+
+  const handleScroll = (e) => {
+    if (loading || loadingMore || !hasMore) return;
+    const el = e.target;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight > SCROLL_THRESHOLD) return;
+    setLoadingMore(true);
+    loadPage(pageRef.current + 1, true)
+      .catch(() => addToast("Failed to load more messages.", "error"))
+      .finally(() => setLoadingMore(false));
+  };
 
   useEffect(() => {
     socket.connect();
@@ -56,7 +79,14 @@ const MessageList = () => {
       <div className="table-view__header">
         <h1>Messages</h1>
       </div>
-      <Table columns={columns} data={messages} loading={loading} emptyMessage="No messages found." />
+      <Table
+        columns={columns}
+        data={messages}
+        loading={loading}
+        emptyMessage="No messages found."
+        onScroll={handleScroll}
+        footer={loadingMore ? "Loading more messages…" : null}
+      />
     </div>
   );
 };
