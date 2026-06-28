@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { roomService } from "../../../api/services/room";
 import { useToast } from "../../../context/ToastContext";
 import { OFFLINE_THRESHOLD_MS } from "../../../constants/device";
+import { isVoltageAlive } from "../../../constants/voltage";
 import { deviceService } from "../../../api/services/device";
 import { messageService } from "../../../api/services/message";
 import Button from "../../../components/ui/Button/Button";
@@ -61,9 +62,12 @@ const RoomList = () => {
                   );
                   const latestMessage = messages[0];
                   if (latestMessage) {
-                    currentlyInside += (latestMessage.in || 0) - (latestMessage.out || 0);
+                    const samples = latestMessage.motion?.samples || [];
+                    for (let i = 1; i < samples.length; i++) {
+                      currentlyInside += (samples[i][3] || 0) - (samples[i][4] || 0);
+                    }
                     const age = Date.now() - new Date(latestMessage.createdAt);
-                    if (latestMessage.battery !== 0 && age < OFFLINE_THRESHOLD_MS) {
+                    if (isVoltageAlive(latestMessage.system?.voltage_rest) && age < OFFLINE_THRESHOLD_MS) {
                       isOnline = true;
                     }
                   }

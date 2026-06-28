@@ -21,10 +21,7 @@ export const validateMessage = async (msg) => {
         }
         return true;
     } catch (error) {
-        console.error(
-            `Message invalid for device: ${serial_number}:`,
-            error.message,
-        );
+        console.error("[Validator] Message invalid:", error.message);
         return false;
     }
 };
