@@ -15,7 +15,7 @@ export const deviceController = {
   },
   delete: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.deviceId;
       await deviceDeleteAbl(id);
       res.status(200).json({ status: "success" });
     } catch (error) {
@@ -24,7 +24,7 @@ export const deviceController = {
   },
   get: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.deviceId;
       const device = await deviceGetAbl(id);
       res.status(200).json({ status: "success", data: device });
     } catch (error) {
@@ -36,7 +36,7 @@ export const deviceController = {
       const device = req.body;
       const data = {
         ...device,
-        id: req.params.id,
+        id: req.params.deviceId,
       };
       const updatedDevice = await deviceUpdateAbl(data);
       res.status(200).json({ status: "success", data: updatedDevice });

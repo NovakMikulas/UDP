@@ -15,17 +15,10 @@ router.get(
 );
 
 router.get(
-  "/get/:id",
+  "/get/:messageId",
   authMiddleware,
   authorizeMiddleware(["Owner", "Member"]),
   messageController.get,
-);
-
-router.delete(
-  "/delete/:id",
-  authMiddleware,
-  authorizeMiddleware(["Owner"]),
-  messageController.delete,
 );
 
 export default router;

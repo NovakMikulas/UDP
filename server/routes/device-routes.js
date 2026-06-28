@@ -19,21 +19,21 @@ router.get(
 );
 
 router.get(
-  "/get/:id",
+  "/get/:deviceId",
   authMiddleware,
   authorizeMiddleware(["Owner", "Member"]),
   deviceController.get,
 );
 
 router.put(
-  "/update/:id",
+  "/update/:deviceId",
   authMiddleware,
   authorizeMiddleware(["Owner"]),
   deviceController.update,
 );
 
 router.delete(
-  "/delete/:id",
+  "/delete/:deviceId",
   authMiddleware,
   authorizeMiddleware(["Owner"]),
   deviceController.delete,

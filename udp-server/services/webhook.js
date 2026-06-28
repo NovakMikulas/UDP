@@ -5,33 +5,28 @@ dotenv.config();
 const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "default";
 
 export const sendWebhook = async (data) => {
-  const WEBHOOK_URL =
-    process.env.WEBHOOK_URL || "http://localhost:3000/api/message/create";
-
+  const WEBHOOK_URL = process.env.WEBHOOK_URL;
   if (!WEBHOOK_URL) {
-    console.warn("[Webhook] URL is not defined in .env");
+    console.warn("[Webhook] WEBHOOK_URL is not defined in .env");
     return;
   }
-  console.log("[Webhook] Sending data to webhook:", data);
   try {
     const body = JSON.stringify(data);
+    const timestamp = Date.now().toString();
     const signature = crypto
       .createHmac("sha256", WEBHOOK_SECRET)
-      .update(body)
+      .update(timestamp + body)
       .digest("hex");
 
-    const response = await axios.post(
-      WEBHOOK_URL,
-      body,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-signature": signature,
-          "x-source": "udp-server",
-        },
+    const response = await axios.post(WEBHOOK_URL, body, {
+      headers: {
+        "Content-Type": "application/json",
+        "x-signature": signature,
+        "x-timestamp": timestamp,
+        "x-source": "udp-server",
       },
-      { timeout: 5000 },
-    );
+      timeout: 5000,
+    });
 
     console.log(`[Webhook] successfully send: ${response.status}`);
   } catch (error) {

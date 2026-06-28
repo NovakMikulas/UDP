@@ -6,7 +6,7 @@ const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || "default";
 
 const authorizeWebhook = (req, res, next) => {
   const signature = req.headers["x-signature"];
-  const timestamp = req.body.timestamp;
+  const timestamp = req.headers["x-timestamp"];
   if (!signature || !timestamp) {
     return next(
       new ApiError(401, "[MIDDLEWARE] Missing webhook security credentials."),
@@ -14,11 +14,10 @@ const authorizeWebhook = (req, res, next) => {
   }
 
   // Check timestamp to prevent replay attacks
-  const msgTime = new Date(timestamp).getTime();
   const now = Date.now();
-  const tolerance = 60000; // 1 minute tolerance for replay attacks
+  const tolerance = 60000;
 
-  if (Math.abs(now - msgTime) > tolerance) {
+  if (Math.abs(now - Number(timestamp)) > tolerance) {
     return next(
       new ApiError(
         403,
@@ -29,7 +28,7 @@ const authorizeWebhook = (req, res, next) => {
 
   const expectedSignature = crypto
     .createHmac("sha256", WEBHOOK_SECRET)
-    .update(JSON.stringify(req.body))
+    .update(timestamp + JSON.stringify(req.body))
     .digest("hex");
 
   // timingSafeEqual to prevent against timing attacks

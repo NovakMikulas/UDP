@@ -1,8 +1,7 @@
 import messageCreateAbl from "../abl/message/message-create-abl.js";
-import messageDeleteAbl from "../abl/message/message-delete-abl.js";
 import messageGetAbl from "../abl/message/message-get-abl.js";
-//import messageUpdateAbl from "../abl/message/message-update-abl.js";
 import messageListAbl from "../abl/message/message-list-abl.js";
+
 export const messageController = {
   create: async (req, res, next) => {
     try {
@@ -13,18 +12,9 @@ export const messageController = {
       next(error);
     }
   },
-  delete: async (req, res, next) => {
-    try {
-      const id = req.body.id;
-      await messageDeleteAbl(id);
-      res.status(200).json({ status: "success" });
-    } catch (error) {
-      next(error);
-    }
-  },
   get: async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = req.params.messageId;
       const message = await messageGetAbl(id);
       res.status(200).json({ status: "success", data: message });
     } catch (error) {
@@ -33,9 +23,15 @@ export const messageController = {
   },
   list: async (req, res, next) => {
     try {
-      const deviceId = req.params.deviceId;
-      const messages = await messageListAbl(deviceId);
-      res.status(200).json({ status: "success", data: messages });
+      const data = { deviceId: req.params.deviceId };
+      if (req.query.page !== undefined) data.page = Number(req.query.page);
+      if (req.query.limit !== undefined) data.limit = Number(req.query.limit);
+      const { items, page, limit, total, totalPages } = await messageListAbl(data);
+      res.status(200).json({
+        status: "success",
+        data: items,
+        pagination: { page, limit, total, totalPages },
+      });
     } catch (error) {
       next(error);
     }

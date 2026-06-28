@@ -3,7 +3,6 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 4px;
-  margin-bottom: var(--spacing-sm);
 }
 
 .breadcrumb__item {
@@ -22,13 +21,16 @@
   color: var(--color-text-muted);
   text-decoration: none;
   transition: color 0.15s;
+  opacity: 0.6;
 }
 
 .breadcrumb__link:hover {
-  color: var(--color-text-primary);
+  opacity: 1;
+  color: var(--color-text-muted);
 }
 
 .breadcrumb__current {
   font-size: var(--text-sm);
-  color: var(--color-text-primary);
+  color: var(--color-text-muted);
+  font-weight: 600;
 }

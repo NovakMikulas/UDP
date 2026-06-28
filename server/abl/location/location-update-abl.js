@@ -8,10 +8,19 @@ const schema = {
   type: "object",
   properties: {
     id: { type: "string" },
-    owner: { type: "string" },
     members: { type: "array", items: { type: "string" } },
     name: { type: "string" },
-    address: { type: "string" },
+    address: {
+      type: "object",
+      properties: {
+        street: { type: "string" },
+        city: { type: "string" },
+        zip: { type: "string" },
+        country: { type: "string" },
+      },
+      required: ["street", "city", "zip", "country"],
+      additionalProperties: false,
+    },
   },
   required: ["id"],
   additionalProperties: false,

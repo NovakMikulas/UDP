@@ -11,11 +11,11 @@ const schema = {
   type: "object",
   properties: {
     serialNumber: { type: "string" },
-    in: { type: "number" },
-    out: { type: "number" },
-    battery: { type: "number" },
+    message: { type: "object" },
+    system: { type: "object" },
+    motion: { type: "object" },
   },
-  required: ["serialNumber", "in", "out", "battery"],
+  required: ["serialNumber", "message", "motion"],
 };
 
 async function messageCreateAbl(data) {
