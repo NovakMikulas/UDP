@@ -3,6 +3,7 @@ import { Schema, model } from "mongoose";
 const messageSchema = new Schema(
   {
     deviceId: { type: Schema.Types.ObjectId, ref: "Device", required: true },
+    roomId: { type: Schema.Types.ObjectId, ref: "Room", required: true },
     message: {
       version: { type: Number },
       sequence: { type: Number },

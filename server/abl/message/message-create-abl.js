@@ -36,6 +36,7 @@ async function messageCreateAbl(data) {
   const processedData = {
     ...data,
     deviceId: device._id,
+    roomId: device.roomId,
   };
   const message = await messageCreateDao(processedData);
 
