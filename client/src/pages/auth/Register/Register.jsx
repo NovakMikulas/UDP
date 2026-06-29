@@ -30,8 +30,8 @@ const Register = () => {
     }
 
     try {
-      const { username, email, password } = formData;
-      const response = await authService.register(username, email, password);
+      const { username, email, password, confirmPassword } = formData;
+      const response = await authService.register(username, email, password, confirmPassword);
       addToast(response.message || "Successfully registered.", "success");
       setFormData({ username: "", email: "", password: "", confirmPassword: "" });
       setTimeout(() => navigate("/login"), 2000);
