@@ -7,7 +7,7 @@
   border-radius: var(--radius);
   overflow: hidden;
   background-color: var(--color-bg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-card);
 }
 
 .card-grid-scroll {
@@ -63,6 +63,7 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   cursor: pointer;
+  box-shadow: var(--shadow-card);
   transition: box-shadow 0.15s;
 }
 
@@ -174,20 +175,3 @@
   border-radius: 99px;
 }
 
-
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  border-radius: var(--radius);
-}
-
-.icon-btn:hover {
-  background-color: var(--color-hover);
-
-}

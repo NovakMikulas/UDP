@@ -20,6 +20,35 @@ const columns = [
   { header: "Voltage",      render: (msg) => voltageStatus(msg.system?.voltage_rest) },
 ];
 
+const MsgCard = ({ msg }) => (
+  <div className="msg-card">
+    <div className="msg-card__time">{new Date(msg.createdAt).toLocaleString()}</div>
+    <div className="msg-card__rows">
+      <div className="msg-card__row">
+        <span className="msg-card__label">Motion left</span>
+        <span className="msg-card__value">{msg.motion?.totalizer?.motion_left ?? "—"}</span>
+      </div>
+      <div className="msg-card__row">
+        <span className="msg-card__label">Motion right</span>
+        <span className="msg-card__value">{msg.motion?.totalizer?.motion_right ?? "—"}</span>
+      </div>
+      <div className="msg-card__row">
+        <span className="msg-card__label">Samples</span>
+        <span className="msg-card__value">{msg.motion?.samples ? msg.motion.samples.length - 1 : 0}</span>
+      </div>
+    </div>
+    <div className="msg-card__divider" />
+    <div className="msg-card__footer">
+      <span className="msg-card__temp">
+        {msg.thermometer?.temperature != null ? `${msg.thermometer.temperature} °C` : "—"}
+      </span>
+      <span className="msg-card__voltage">
+        {voltageStatus(msg.system?.voltage_rest)}
+      </span>
+    </div>
+  </div>
+);
+
 const MessageList = () => {
   const { deviceId, locationId, roomId } = useParams();
   const { state } = useLocation();
@@ -31,7 +60,15 @@ const MessageList = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 768px)").matches);
   const pageRef = useRef(1);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(max-width: 768px)");
+    const handler = (e) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
 
   const loadPage = (page, append) =>
     messageService.list(deviceId, locationId, page, PAGE_SIZE).then((data) => {
@@ -82,14 +119,23 @@ const MessageList = () => {
       <div className="list-view__header">
         <h1>Messages</h1>
       </div>
-      <Table
-        columns={columns}
-        data={messages}
-        loading={loading}
-        emptyMessage="No messages found."
-        onScroll={handleScroll}
-        footer={loadingMore ? "Loading more messages…" : null}
-      />
+      {isMobile ? (
+        <div className="msg-card-list" onScroll={handleScroll}>
+          {loading && <p className="msg-card-list__state">Loading…</p>}
+          {!loading && messages.length === 0 && <p className="msg-card-list__state">No messages found.</p>}
+          {messages.map((msg) => <MsgCard key={msg._id} msg={msg} />)}
+          {loadingMore && <p className="msg-card-list__state">Loading more messages…</p>}
+        </div>
+      ) : (
+        <Table
+          columns={columns}
+          data={messages}
+          loading={loading}
+          emptyMessage="No messages found."
+          onScroll={handleScroll}
+          footer={loadingMore ? "Loading more messages…" : null}
+        />
+      )}
     </div>
   );
 };

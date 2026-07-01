@@ -4,6 +4,9 @@ import locationGetAbl from "../abl/location/location-get-abl.js";
 import locationUpdateAbl from "../abl/location/location-update-abl.js";
 import locationListAbl from "../abl/location/location-list-abl.js";
 import locationInviteUserAbl from "../abl/location/location-inviteUser-abl.js";
+import locationKickUserAbl from "../abl/location/location-kickUser-abl.js";
+import locationInviteDecisionAbl from "../abl/location/location-inviteDecision-abl.js";
+import locationListInvitationsAbl from "../abl/location/location-listInvitations-abl.js";
 
 export const locationController = {
   create: async (req, res, next) => {
@@ -65,6 +68,43 @@ export const locationController = {
         email: req.body.email,
       };
       await locationInviteUserAbl(data);
+      res.status(200).json({ status: "success" });
+    } catch (error) {
+      next(error);
+    }
+  },
+  kick: async (req, res, next) => {
+    try {
+      const data = {
+        id: req.params.locationId,
+        userId: req.params.userId,
+      };
+      await locationKickUserAbl(data);
+      res.status(200).json({ status: "success" });
+    } catch (error) {
+      next(error);
+    }
+  },
+  listInvitations: async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const invitations = await locationListInvitationsAbl(userId);
+      res.status(200).json({ status: "success", data: invitations });
+    } catch (error) {
+      next(error);
+    }
+  },
+  acceptInvite: async (req, res, next) => {
+    try {
+      await locationInviteDecisionAbl(req.params.locationId, req.user.id, true);
+      res.status(200).json({ status: "success" });
+    } catch (error) {
+      next(error);
+    }
+  },
+  declineInvite: async (req, res, next) => {
+    try {
+      await locationInviteDecisionAbl(req.params.locationId, req.user.id, false);
       res.status(200).json({ status: "success" });
     } catch (error) {
       next(error);

@@ -5,6 +5,12 @@ const locationSchema = new Schema(
   {
     owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
     members: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    invitations: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
     name: { type: String, required: true },
     address: {
       street: { type: String, required: true },

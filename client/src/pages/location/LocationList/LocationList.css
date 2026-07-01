@@ -11,3 +11,29 @@
 .members-cell .table-avatar:first-child {
   margin-left: 0;
 }
+
+.kick-member-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kick-member-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--color-bg);
+}
+
+.kick-member-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kick-member-email {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}

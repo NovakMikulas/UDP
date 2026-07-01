@@ -35,4 +35,9 @@ export const deviceService = {
     });
     return response.data;
   },
+
+  listAll: async () => {
+    const response = await api.get("/device/list-all");
+    return response.data;
+  },
 };

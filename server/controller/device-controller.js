@@ -3,6 +3,7 @@ import deviceDeleteAbl from "../abl/device/device-delete-abl.js";
 import deviceGetAbl from "../abl/device/device-get-abl.js";
 import deviceUpdateAbl from "../abl/device/device-update-abl.js";
 import deviceListAbl from "../abl/device/device-list-abl.js";
+import deviceListAllAbl from "../abl/device/device-listAll-abl.js";
 export const deviceController = {
   create: async (req, res, next) => {
     try {
@@ -48,6 +49,15 @@ export const deviceController = {
     try {
       const roomId = req.params.roomId;
       const devices = await deviceListAbl(roomId);
+      res.status(200).json({ status: "success", data: devices });
+    } catch (error) {
+      next(error);
+    }
+  },
+  listAll: async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const devices = await deviceListAllAbl(userId);
       res.status(200).json({ status: "success", data: devices });
     } catch (error) {
       next(error);
