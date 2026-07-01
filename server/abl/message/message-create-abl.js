@@ -11,11 +11,11 @@ const schema = {
   type: "object",
   properties: {
     serialNumber: { type: "string" },
-    in: { type: "number", minimum: 0 },
-    out: { type: "number", minimum: 0 },
-    battery: { type: "number", minimum: 0, maximum: 100 },
+    message: { type: "object" },
+    system: { type: "object" },
+    motion: { type: "object" },
   },
-  required: ["serialNumber", "in", "out", "battery"],
+  required: ["serialNumber", "message", "motion"],
 };
 
 async function messageCreateAbl(data) {
@@ -36,6 +36,7 @@ async function messageCreateAbl(data) {
   const processedData = {
     ...data,
     deviceId: device._id,
+    roomId: device.roomId,
   };
   const message = await messageCreateDao(processedData);
 

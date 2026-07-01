@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { deviceService } from "../../../api/services/device";
 import { useToast } from "../../../context/ToastContext";
 import { OFFLINE_THRESHOLD_MS } from "../../../constants/device";
+import { voltageStatus, isVoltageAlive } from "../../../constants/voltage";
 import { messageService } from "../../../api/services/message";
 import Button from "../../../components/ui/Button/Button";
 import Input from "../../../components/ui/Input/Input";
@@ -49,15 +50,16 @@ const DeviceList = () => {
             );
             const latest = messages[0];
             const age = latest ? Date.now() - new Date(latest.createdAt) : Infinity;
-            const isOnline = !!latest && latest.battery !== 0 && age < OFFLINE_THRESHOLD_MS;
+            const voltage = latest?.system?.voltage_rest ?? null;
+            const isOnline = !!latest && isVoltageAlive(voltage) && age < OFFLINE_THRESHOLD_MS;
             return {
               ...device,
               lastMessageAt: latest?.createdAt ?? null,
-              battery: latest?.battery ?? null,
+              voltage,
               isOnline,
             };
           } catch {
-            return { ...device, lastMessageAt: null, battery: null, isOnline: false };
+            return { ...device, lastMessageAt: null, voltage: null, isOnline: false };
           }
         })
       );
@@ -161,7 +163,7 @@ const DeviceList = () => {
                   name={device.serialNumber}
                   rows={[
                     { label: "Last message", render: device.lastMessageAt ? new Date(device.lastMessageAt).toLocaleString() : "—" },
-                    { label: "Battery", render: device.battery != null ? `${device.battery}%` : "—" },
+                    { label: "Voltage", render: voltageStatus(device.voltage) },
                   ]}
                   footerLeft={device.serialNumber}
                   footerRight={

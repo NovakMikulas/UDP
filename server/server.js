@@ -18,8 +18,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173", 
-    credentials: true, 
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
   }),
 );
 app.use("/api/device", deviceRoutes);

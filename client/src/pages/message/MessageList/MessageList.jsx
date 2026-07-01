@@ -5,16 +5,19 @@ import { useToast } from "../../../context/ToastContext";
 import socket from "../../../api/socket";
 import Table from "../../../components/ui/Table/Table";
 import Breadcrumb from "../../../components/ui/Breadcrumb/Breadcrumb";
+import { voltageStatus } from "../../../constants/voltage";
 import "./MessageList.css";
 
 const PAGE_SIZE = 20;
 const SCROLL_THRESHOLD = 120;
 
 const columns = [
-  { header: "Time",    render: (msg) => new Date(msg.createdAt).toLocaleString() },
-  { header: "In",      render: (msg) => msg.in },
-  { header: "Out",     render: (msg) => msg.out },
-  { header: "Battery", render: (msg) => (msg.battery != null ? `${msg.battery}%` : "—") },
+  { header: "Time",         render: (msg) => new Date(msg.createdAt).toLocaleString() },
+  { header: "Motion Left",  render: (msg) => msg.motion?.totalizer?.motion_left ?? "—" },
+  { header: "Motion Right", render: (msg) => msg.motion?.totalizer?.motion_right ?? "—" },
+  { header: "Temperature",  render: (msg) => msg.thermometer?.temperature != null ? `${msg.thermometer.temperature} °C` : "—" },
+  { header: "Samples",      render: (msg) => msg.motion?.samples ? msg.motion.samples.length - 1 : 0 },
+  { header: "Voltage",      render: (msg) => voltageStatus(msg.system?.voltage_rest) },
 ];
 
 const MessageList = () => {

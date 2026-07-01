@@ -9,21 +9,15 @@ export const decodeMessage = async (msg) => {
   const serialNumber = msg.readUInt32LE(LEN_HASH_SIZE);
   const raw = msg.slice(HEADER_SIZE);
   try {
-    //DECODE RAW WITH CBOR
-    const decodedRawData = cbor.decodeFirstSync(raw);
-    console.log(`[Decoder] Data from device: ${serialNumber}:`, decodedRawData);
+    const decoded = cbor.decodeFirstSync(raw);
+    console.log(`[Decoder] Raw data from device ${serialNumber}:`, JSON.stringify(decoded));
 
-    //STRUCTURE DATA
-    const processedData = {
+    return {
       serialNumber: serialNumber.toString(),
-      in: decodedRawData.in || 0,
-      out: decodedRawData.out || 0,
-      battery: decodedRawData.battery || 0,
-      timestamp: decodedRawData.timestamp,
+      ...decoded,
     };
-    return processedData;
   } catch (error) {
-    console.error(`Decoder failed for device: ${serialNumber}:`, error.message);
+    console.error(`[Decoder] Failed for device ${serialNumber}:`, error.message);
     throw error;
   }
 };
