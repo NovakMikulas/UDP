@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   overflow: hidden;
   background-color: var(--color-bg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
@@ -57,7 +57,7 @@
 .card {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
@@ -114,7 +114,7 @@
 
 .card__bar-track {
   height: 6px;
-  background-color: var(--color-bg-sidebar);
+  background-color: rgba(0, 0, 0, 0.08);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -149,9 +149,18 @@
 .card__footer-right {
   display: flex;
   align-items: center;
+  font-size: var(--text-sm);
+}
+
+.card__status--online {
+  display: flex;
+  align-items: center;
   gap: 4px;
   font-size: var(--text-sm);
   color: var(--color-accent);
+  background-color: var(--color-online-bg);
+  padding: 2px 8px;
+  border-radius: 99px;
 }
 
 .card__status--offline {
@@ -160,4 +169,25 @@
   gap: 4px;
   font-size: var(--text-sm);
   color: var(--color-danger);
+  background-color: var(--color-offline-bg);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
+.icon-btn:hover {
+  background-color: var(--color-hover);
+
 }
