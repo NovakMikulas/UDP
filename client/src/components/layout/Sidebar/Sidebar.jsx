@@ -44,7 +44,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           <DeviceHubIcon fontSize="small" /> Devices
         </NavLink>
 
-        <span className="sidebar-section-label">ADMINISTRATION</span>
+        <span className="sidebar-section-label">ACCOUNT</span>
 
         <NavLink to="/notifications" onClick={onClose} className={({ isActive }) => `sidebar-link${isActive ? " active" : ""}`}>
           <NotificationsNoneIcon fontSize="small" /> Notifications

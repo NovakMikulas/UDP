@@ -1,7 +1,7 @@
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;
@@ -13,12 +13,12 @@
 }
 
 .btn-primary {
-  background-color: var(--color-accent2);
+  background-color: var(--color-bg-sidebar-active);
   color: var(--color-bg);
 }
 
 .btn-primary:hover {
-  background-color: color-mix(in srgb, var(--color-accent2) 85%, #000);
+  background-color: color-mix(in srgb, var(--color-text-primary) var(--btn-hover-darken), #242445);
 }
 
 .btn-success {
@@ -28,7 +28,7 @@
 }
 
 .btn-success:hover {
-  background-color: color-mix(in srgb, var(--color-accent) 85%, #000);
+  background-color: color-mix(in srgb, var(--color-accent) var(--btn-hover-darken), #242445);
 }
 
 .btn-danger {
@@ -37,7 +37,7 @@
 }
 
 .btn-danger:hover {
-  background-color: color-mix(in srgb, var(--color-danger) 85%, #000);
+  background-color: color-mix(in srgb, var(--color-danger) var(--btn-hover-darken), #242445);
 }
 
 .btn-full {

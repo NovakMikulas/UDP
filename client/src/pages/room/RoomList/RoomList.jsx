@@ -159,17 +159,17 @@ const RoomList = () => {
   ];
 
   return (
-    <div className="table-view">
+    <div className="list-view">
       <Breadcrumb items={[
         { label: "Locations", path: "/locations" },
         { label: locationName },
       ]} />
-      <div className="table-view__header">
+      <div className="list-view__header">
         <h1>Rooms</h1>
       </div>
 
-      <div className="table-view__toolbar">
-        <div className="table-view__search">
+      <div className="list-view__toolbar">
+        <div className="list-view__search">
           <SearchIcon fontSize="small" />
           <input
             placeholder="Search room..."
@@ -192,10 +192,12 @@ const RoomList = () => {
                   name={room.name}
                   rows={[
                     { label: "Capacity", render: room.capacity ?? 0 },
-                    { label: "Currently inside", render: room.currentlyInside ?? 0 },
+                    { label: "Currently inside", render: room.isOnline ? (room.currentlyInside ?? 0) : "Unknown" },
                   ]}
                   extra={(() => {
-                    const pct = room.capacity > 0 ? Math.min((room.currentlyInside ?? 0) / room.capacity, 1) : 0;
+                    const pct = room.isOnline && room.capacity > 0
+                      ? Math.min((room.currentlyInside ?? 0) / room.capacity, 1)
+                      : 0;
                     return (
                       <div className="card__bar-track">
                         <div className={`card__bar-fill${pct >= 0.8 ? " danger" : ""}`} style={{ width: `${pct * 100}%` }} />
@@ -205,7 +207,7 @@ const RoomList = () => {
                   footerLeft={room.deviceSerials || "—"}
                   footerRight={
                     room.isOnline
-                      ? <><CheckCircleOutlineIcon fontSize="small" />Online</>
+                      ? <span className="card__status--online"><CheckCircleOutlineIcon fontSize="small" />Online</span>
                       : <span className="card__status--offline"><CancelOutlinedIcon fontSize="small" />Offline</span>
                   }
                   onClick={() => navigate(`/locations/${locationId}/rooms/${room._id}/devices`, { state: { locationName, roomName: room.name } })}

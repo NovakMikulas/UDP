@@ -173,14 +173,14 @@ const LocationList = () => {
   };
 
   return (
-    <div className="table-view">
+    <div className="list-view">
       <Breadcrumb items={[{ label: "Locations" }]} />
-      <div className="table-view__header">
+      <div className="list-view__header">
         <h1>Locations</h1>
       </div>
 
-      <div className="table-view__toolbar">
-        <div className="table-view__search">
+      <div className="list-view__toolbar">
+        <div className="list-view__search">
           <SearchIcon fontSize="small" />
           <input placeholder="Search location..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>

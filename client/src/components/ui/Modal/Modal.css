@@ -10,7 +10,7 @@
 
 .modal {
   background-color: var(--color-bg);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   width: 480px;
   max-width: 90vw;
   max-height: 90vh;

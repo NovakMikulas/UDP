@@ -14,8 +14,8 @@
   width: 100%;
   padding: 10px 12px;
   background-color: var(--color-bg);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
   color: var(--color-text-primary);
   font-size: var(--text-base);
   box-sizing: border-box;
@@ -28,5 +28,5 @@
 
 .input-group input:focus {
   outline: none;
-  border-color: var(--color-accent);
+  border-color: var(--color-text-primary);
 }
