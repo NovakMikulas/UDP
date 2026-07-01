@@ -48,9 +48,9 @@ const Notifications = () => {
   };
 
   return (
-    <div className="table-view">
+    <div className="list-view">
       <Breadcrumb items={[{ label: "Notifications" }]} />
-      <div className="table-view__header">
+      <div className="list-view__header">
         <h1>Notifications</h1>
       </div>
 

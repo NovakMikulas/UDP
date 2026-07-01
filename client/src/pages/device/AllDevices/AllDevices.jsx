@@ -67,14 +67,14 @@ const AllDevices = () => {
   });
 
   return (
-    <div className="table-view">
+    <div className="list-view">
       <Breadcrumb items={[{ label: "Devices" }]} />
-      <div className="table-view__header">
+      <div className="list-view__header">
         <h1>All Devices</h1>
       </div>
 
-      <div className="table-view__toolbar">
-        <div className="table-view__search">
+      <div className="list-view__toolbar">
+        <div className="list-view__search">
           <SearchIcon fontSize="small" />
           <input
             placeholder="Search device, location, room..."
