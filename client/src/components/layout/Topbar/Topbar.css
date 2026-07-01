@@ -19,11 +19,11 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-primary);
+  color: var(--color-sidebar-text);
   display: flex;
   align-items: center;
   padding: 4px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
 }
 
 .topbar-menu-btn:hover {

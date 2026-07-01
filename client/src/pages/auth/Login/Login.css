@@ -37,6 +37,7 @@
 
 .login-form Button {
   margin-top: var(--spacing-md);
+  background-color: var(--color-bg-sidebar-active);
 }
 
 .signup-link {

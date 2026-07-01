@@ -69,14 +69,14 @@ const MessageList = () => {
   }, [deviceId]);
 
   return (
-    <div className="table-view">
+    <div className="list-view">
       <Breadcrumb items={[
         { label: "Locations", path: "/locations" },
         { label: locationName, path: `/locations/${locationId}/rooms`, state: { locationName } },
         { label: roomName, path: `/locations/${locationId}/rooms/${roomId}/devices`, state: { locationName, roomName } },
         { label: deviceSerial },
       ]} />
-      <div className="table-view__header">
+      <div className="list-view__header">
         <h1>Messages</h1>
       </div>
       <Table

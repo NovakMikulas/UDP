@@ -3,7 +3,7 @@
   right: 0;
   top: calc(100% + 4px);
   background-color: var(--color-bg);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   min-width: 160px;
   z-index: 100;
   overflow: hidden;
@@ -40,5 +40,5 @@
 }
 
 .action-menu__item-danger:hover {
-  background-color: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  background-color: var(--color-hover-danger);
 }
