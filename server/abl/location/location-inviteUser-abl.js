@@ -3,9 +3,9 @@ import addFormats from "ajv-formats";
 const ajv = new Ajv();
 addFormats(ajv);
 import ApiError from "../../utils/api-error.js";
-import locationInviteUserDao from "../../dao/location/location-inviteUser-dao.js";
 import locationGetDao from "../../dao/location/location-get-dao.js";
 import userGetDao from "../../dao/user/user-get-dao.js";
+import LOCATION_MODEL from "../../models/Location.js";
 
 const schema = {
   type: "object",
@@ -41,7 +41,18 @@ async function locationInviteUserAbl(data) {
     throw new ApiError(409, "[ABL] User is already a member of this location.");
   }
 
-  return await locationInviteUserDao(data.id, user._id);
+  const alreadyInvited = location.invitations.some((inv) =>
+    inv.userId.equals(user._id),
+  );
+  if (alreadyInvited) {
+    throw new ApiError(409, "[ABL] User already has a pending invitation.");
+  }
+
+  return await LOCATION_MODEL.findByIdAndUpdate(
+    data.id,
+    { $push: { invitations: { userId: user._id } } },
+    { new: true },
+  );
 }
 
 export default locationInviteUserAbl;

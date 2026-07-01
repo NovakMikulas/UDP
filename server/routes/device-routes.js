@@ -11,6 +11,8 @@ router.post(
   deviceController.create,
 );
 
+router.get("/list-all", authMiddleware, deviceController.listAll);
+
 router.get(
   "/list/:roomId",
   authMiddleware,

@@ -31,6 +31,12 @@ const LocationList = () => {
   const formatAddress = (address) =>
     address ? [address.street, address.city, address.zip, address.country].filter(Boolean).join(", ") : "";
 
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteLocation, setInviteLocation] = useState(null);
+  const [kickOpen, setKickOpen] = useState(false);
+  const [kickLocation, setKickLocation] = useState(null);
+
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
           deleteOpen, openAdd, openUpdate, openDelete, closeAll } = useCrudModal();
 
@@ -114,6 +120,43 @@ const LocationList = () => {
     }
   };
 
+  const handleOpenInvite = (loc) => {
+    setInviteLocation(loc);
+    setInviteEmail("");
+    setInviteOpen(true);
+  };
+
+  const handleInvite = async (e) => {
+    e.preventDefault();
+    try {
+      await locationService.invite(inviteLocation._id, inviteEmail);
+      setInviteOpen(false);
+      fetchLocations();
+      addToast("User invited successfully.", "success");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to invite user.", "error");
+    }
+  };
+
+  const handleOpenKick = (loc) => {
+    setKickLocation(loc);
+    setKickOpen(true);
+  };
+
+  const handleKick = async (memberId) => {
+    try {
+      await locationService.kick(kickLocation._id, memberId);
+      fetchLocations();
+      setKickLocation((prev) => ({
+        ...prev,
+        members: prev.members.filter((m) => m._id !== memberId),
+      }));
+      addToast("User removed.", "success");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to remove user.", "error");
+    }
+  };
+
   const getMenuItems = (loc) => {
     const isOwner = loc.owner?._id === user?.id;
     const items = [
@@ -122,8 +165,8 @@ const LocationList = () => {
     ];
     if (isOwner) {
       items.push(
-        { label: "Invite user", icon: <PersonAddOutlinedIcon fontSize="small" />, onClick: () => console.log("invite", loc) },
-        { label: "Kick user", icon: <PersonRemoveOutlinedIcon fontSize="small" />, onClick: () => console.log("kick", loc), variant: "danger" },
+        { label: "Invite user", icon: <PersonAddOutlinedIcon fontSize="small" />, onClick: () => handleOpenInvite(loc) },
+        { label: "Kick user", icon: <PersonRemoveOutlinedIcon fontSize="small" />, onClick: () => handleOpenKick(loc), variant: "danger" },
       );
     }
     return items;
@@ -215,6 +258,38 @@ const LocationList = () => {
             <Button variant="primary" fullWidth onClick={closeAll}>Cancel</Button>
             <Button variant="danger" fullWidth onClick={handleDelete}>Delete</Button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal isOpen={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite user">
+        <form onSubmit={handleInvite} className="modal-form">
+          <p>Invite a user to <strong>{inviteLocation?.name}</strong> by email.</p>
+          <Input id="inviteEmail" label="Email" type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="user@example.com" required />
+          <Button type="submit" variant="success" fullWidth>Invite</Button>
+        </form>
+      </Modal>
+
+      <Modal isOpen={kickOpen} onClose={() => setKickOpen(false)} title="Manage members">
+        <div className="modal-form">
+          <p>Members of <strong>{kickLocation?.name}</strong></p>
+          {kickLocation?.members?.length > 0 ? (
+            <div className="kick-member-list">
+              {kickLocation.members.map((member) => (
+                <div key={member._id} className="kick-member-row">
+                  <div className="kick-member-info">
+                    <span className="table-avatar">{member.username?.charAt(0).toUpperCase()}</span>
+                    <div>
+                      <div>{member.username}</div>
+                      <div className="kick-member-email">{member.email}</div>
+                    </div>
+                  </div>
+                  <Button variant="danger" onClick={() => handleKick(member._id)}>Remove</Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p>No members to remove.</p>
+          )}
         </div>
       </Modal>
     </div>

@@ -8,8 +8,10 @@ import Register from "./pages/auth/Register/Register.jsx";
 import LocationList from "./pages/location/LocationList/LocationList.jsx";
 import RoomList from "./pages/room/RoomList/RoomList.jsx";
 import DeviceList from "./pages/device/DeviceList/DeviceList.jsx";
+import AllDevices from "./pages/device/AllDevices/AllDevices.jsx";
 import MessageList from "./pages/message/MessageList/MessageList.jsx";
 import Settings from "./pages/settings/Settings/Settings.jsx";
+import Notifications from "./pages/notifications/Notifications/Notifications.jsx";
 
 function App() {
   return (
@@ -22,10 +24,12 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
+              <Route path="/devices" element={<AllDevices />} />
               <Route path="/locations" element={<LocationList />} />
               <Route path="/locations/:locationId/rooms" element={<RoomList />} />
               <Route path="/locations/:locationId/rooms/:roomId/devices" element={<DeviceList />} />
               <Route path="/locations/:locationId/rooms/:roomId/devices/:deviceId/messages" element={<MessageList />} />
+              <Route path="/notifications" element={<Notifications />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Route>

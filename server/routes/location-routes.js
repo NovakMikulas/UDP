@@ -36,4 +36,15 @@ router.post(
   locationController.invite,
 );
 
+router.delete(
+  "/kick/:locationId/:userId",
+  authMiddleware,
+  authorizeMiddleware(["Owner"]),
+  locationController.kick,
+);
+
+router.get("/invitations", authMiddleware, locationController.listInvitations);
+router.post("/invitations/:locationId/accept", authMiddleware, locationController.acceptInvite);
+router.post("/invitations/:locationId/decline", authMiddleware, locationController.declineInvite);
+
 export default router;
