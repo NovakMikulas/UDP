@@ -16,7 +16,7 @@ const columns = [
   { header: "Motion Left",  render: (msg) => msg.motion?.totalizer?.motion_left ?? "—" },
   { header: "Motion Right", render: (msg) => msg.motion?.totalizer?.motion_right ?? "—" },
   { header: "Temperature",  render: (msg) => msg.thermometer?.temperature != null ? `${msg.thermometer.temperature} °C` : "—" },
-  { header: "Samples",      render: (msg) => msg.motion?.samples ? msg.motion.samples.length - 1 : 0 },
+  { header: "Samples",      render: (msg) => msg.motion?.samples?.length ?? 0 },
   { header: "Voltage",      render: (msg) => voltageStatus(msg.system?.voltage_rest) },
 ];
 
@@ -34,7 +34,7 @@ const MsgCard = ({ msg }) => (
       </div>
       <div className="msg-card__row">
         <span className="msg-card__label">Samples</span>
-        <span className="msg-card__value">{msg.motion?.samples ? msg.motion.samples.length - 1 : 0}</span>
+        <span className="msg-card__value">{msg.motion?.samples?.length ?? 0}</span>
       </div>
     </div>
     <div className="msg-card__divider" />
