@@ -1,4 +1,3 @@
-// server.js
 import dgram from "dgram";
 import dotenv from "dotenv";
 import cbor from "cbor";
@@ -12,6 +11,7 @@ const PORT = process.env.PORT || 5003;
 const DL_SET_SESSION = 0x00;
 const UL_CREATE_SESSION = 0x00;
 const UL_UPLOAD_DATA = 0x01;
+const FLAG_POLL_VALUE = 0x01;
 
 function buildSessionResponse(serialNumber, sequence) {
   const sessionType = Buffer.alloc(1);
@@ -29,7 +29,7 @@ function buildSessionResponse(serialNumber, sequence) {
   const cborData = cbor.encode(map);
   const data = Buffer.concat([sessionType, cborData]);
 
-  return packResponse(serialNumber, FLAG_ACK | FLAG_LAST | FLAG_POLL, sequence, data);
+  return packResponse(serialNumber, FLAG_ACK | FLAG_LAST, sequence, data);
 }
 
 server.on("listening", () => {
@@ -48,17 +48,18 @@ server.on("message", async (msg, rinfo) => {
     const packet = unpackPacket(msg);
     const ackSequence = packet.sequence === 0 ? 1 : packet.sequence + 1;
 
+    console.log(`[Server] Flags: ${packet.flags.toString(2).padStart(4, '0')}, data_len: ${packet.data.length}`);
+
     if (packet.data && packet.data.length > 0) {
       const msgType = packet.data[0];
       console.log(`[Server] Message type: 0x${msgType.toString(16)}`);
 
       if (msgType === UL_CREATE_SESSION) {
-        console.log("[Server] Session create — sending session response");
-        const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
-        console.log("[Server] Session response hex:", sessionResp.toString("hex"));
-        server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
-          if (err) console.error("[Server] Session response failed:", err.message);
-          else console.log("[Server] Session response sent");
+        console.log("[Server] Session create — sending ACK+POLL");
+        const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_LAST | FLAG_POLL, ackSequence, null);
+        server.send(ack, rinfo.port, rinfo.address, (err) => {
+          if (err) console.error("[Server] ACK+POLL failed:", err.message);
+          else console.log("[Server] ACK+POLL sent");
         });
         return;
       }
@@ -69,6 +70,17 @@ server.on("message", async (msg, rinfo) => {
       }
     }
 
+    // POLL request — prázdný paket s POLL flagem
+    if (packet.flags & FLAG_POLL_VALUE && (!packet.data || packet.data.length === 0)) {
+      console.log("[Server] POLL request — sending session data");
+      const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
+      server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
+        if (err) console.error("[Server] Session data failed:", err.message);
+        else console.log("[Server] Session data sent");
+      });
+      return;
+    }
+    console.log(`[Server] Unhandled packet: flags=${packet.flags.toString(2).padStart(4, '0')}, data_len=${packet.data.length}`);
     const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_LAST, ackSequence, null);
     server.send(ack, rinfo.port, rinfo.address, (err) => {
       if (err) console.error("[Server] ACK failed:", err.message);
