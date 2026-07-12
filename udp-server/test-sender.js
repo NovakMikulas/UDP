@@ -64,7 +64,13 @@ client.send(finalPacket, 4444, "localhost", (err) => {
   console.log("Packet sent, waiting for downlink response...");
 });
 
+const timeout = setTimeout(() => {
+  console.log("No downlink received (timeout 3s)");
+  client.close();
+}, 3000);
+
 client.on("message", (msg) => {
+  clearTimeout(timeout);
   try {
     const decoded = cbor.decodeFirstSync(msg);
     console.log("Downlink received:", JSON.stringify(decoded, null, 2));
@@ -73,8 +79,3 @@ client.on("message", (msg) => {
   }
   client.close();
 });
-
-setTimeout(() => {
-  console.log("No downlink received (timeout 3s)");
-  client.close();
-}, 3000);

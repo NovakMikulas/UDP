@@ -63,8 +63,8 @@ const RoomList = () => {
                   const latestMessage = messages[0];
                   if (latestMessage) {
                     const samples = latestMessage.motion?.samples || [];
-                    for (let i = 1; i < samples.length; i++) {
-                      currentlyInside += (samples[i][3] || 0) - (samples[i][4] || 0);
+                    for (let i = 0; i < samples.length; i++) {
+                      currentlyInside += (samples[i].motion_left || 0) - (samples[i].motion_right || 0);
                     }
                     const age = Date.now() - new Date(latestMessage.createdAt);
                     if (isVoltageAlive(latestMessage.system?.voltage_rest) && age < OFFLINE_THRESHOLD_MS) {
