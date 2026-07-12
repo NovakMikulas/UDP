@@ -13,11 +13,15 @@ const UL_CREATE_SESSION = 0x00;
 const UL_UPLOAD_DATA = 0x01;
 const FLAG_POLL_VALUE = 0x01;
 
-const uint64_zero = Buffer.from([0x1b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
-
 function buildSessionResponse(serialNumber, sequence) {
   const sessionType = Buffer.from([DL_SET_SESSION]);
-  const timestamp = Math.floor(Date.now() / 1000);
+
+  const ts = BigInt(Math.floor(Date.now() / 1000));
+  const tsBuf = Buffer.alloc(9);
+  tsBuf[0] = 0x1b;
+  tsBuf.writeBigUInt64BE(ts, 1);
+
+  const uint64_zero = Buffer.from([0x1b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
 
   const parts = [
     Buffer.from([0xbf]),
@@ -25,7 +29,7 @@ function buildSessionResponse(serialNumber, sequence) {
     cbor.encode(0x01), uint64_zero,
     cbor.encode(0x02), uint64_zero,
     cbor.encode(0x03), uint64_zero,
-    cbor.encode(0x04), cbor.encode(timestamp),
+    cbor.encode(0x04), tsBuf,
     cbor.encode(0x05), cbor.encode("custom-server"),
     cbor.encode(0x06), cbor.encode("UDP Server"),
     Buffer.from([0xff]),
@@ -80,6 +84,7 @@ server.on("message", async (msg, rinfo) => {
     if (packet.flags & FLAG_POLL_VALUE && (!packet.data || packet.data.length === 0)) {
       console.log("[Server] POLL request — sending session data");
       const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
+      console.log("[Server] Session data hex:", sessionResp.toString("hex"));
       server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
         if (err) console.error("[Server] Session data failed:", err.message);
         else console.log("[Server] Session data sent");
