@@ -77,6 +77,7 @@ server.on("message", async (msg, rinfo) => {
     if (packet.flags & FLAG_POLL_VALUE && (!packet.data || packet.data.length === 0)) {
       console.log("[Server] POLL request — sending session data");
       const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
+      console.log("[Server] Session data hex:", sessionResp.toString("hex"));
       server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
         if (err) console.error("[Server] Session data failed:", err.message);
         else console.log("[Server] Session data sent");
