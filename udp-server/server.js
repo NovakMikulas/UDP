@@ -24,18 +24,22 @@ server.bind(PORT);
 
 server.on("message", async (msg, rinfo) => {
   try {
-    if (!(await validateMessage(msg))) return;
-    const processedData = await decodeMessage(msg);
+    const packet = await validateMessage(msg);
+    if (!packet) return;
 
-    const downlink = buildDownlink(processedData);
-    if (downlink) {
-      server.send(downlink, rinfo.port, rinfo.address, (err) => {
-        if (err) console.error("[Downlink] Failed to send:", err.message);
-      });
+    // Vždy odpověz ACK
+    const ack = buildAckResponse(packet);
+    server.send(ack, rinfo.port, rinfo.address, (err) => {
+      if (err) console.error("[Server] Failed to send ACK:", err.message);
+      else console.log("[Server] ACK sent");
+    });
+
+    // Pokud je to datový paket (ne jen handshake), zpracuj data
+    if (packet.data && packet.data.length > 0) {
+      const processedData = await decodeMessage(packet);
+      await sendWebhook(processedData);
     }
-
-    await sendWebhook(processedData);
   } catch (error) {
-    console.error(`[UDP] Failed to process message from ${rinfo.address}:${rinfo.port}:`, error.message);
+    console.error(`[UDP] Error: ${error.message}`);
   }
 });
