@@ -55,6 +55,7 @@ server.on("message", async (msg, rinfo) => {
       if (msgType === UL_CREATE_SESSION) {
         console.log("[Server] Session create — sending session response");
         const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
+        console.log("[Server] Session response hex:", sessionResp.toString("hex"));
         server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
           if (err) console.error("[Server] Session response failed:", err.message);
           else console.log("[Server] Session response sent");
