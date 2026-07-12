@@ -2,7 +2,7 @@
 import dgram from "dgram";
 import dotenv from "dotenv";
 import cbor from "cbor";
-import { unpackPacket, packResponse, FLAG_ACK, FLAG_LAST } from "./services/validator.js";
+import { unpackPacket, packResponse, FLAG_ACK, FLAG_LAST, FLAG_POLL } from "./services/validator.js";
 
 dotenv.config();
 
@@ -29,7 +29,7 @@ function buildSessionResponse(serialNumber, sequence) {
   const cborData = cbor.encode(map);
   const data = Buffer.concat([sessionType, cborData]);
 
-  return packResponse(serialNumber, FLAG_ACK | FLAG_LAST, sequence, data);
+  return packResponse(serialNumber, FLAG_ACK | FLAG_LAST | FLAG_POLL, sequence, data);
 }
 
 server.on("listening", () => {
