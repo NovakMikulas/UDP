@@ -46,9 +46,8 @@ server.bind(PORT);
 server.on("message", async (msg, rinfo) => {
   try {
     const packet = unpackPacket(msg);
-    const ackSequence = packet.sequence;
+    const ackSequence = packet.sequence + 1;
     console.log(`[Server] Flags: ${packet.flags.toString(2).padStart(4, '0')}, data_len: ${packet.data.length}`);
-
     if (packet.data && packet.data.length > 0) {
       const msgType = packet.data[0];
       console.log(`[Server] Message type: 0x${msgType.toString(16)}`);
