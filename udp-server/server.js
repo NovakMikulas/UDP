@@ -8,13 +8,13 @@ dotenv.config();
 const server = dgram.createSocket("udp4");
 const PORT = process.env.PORT || 5003;
 
-const DL_SET_SESSION    = 0x00;
+const DL_SET_SESSION    = 0x80;
 const UL_CREATE_SESSION = 0x00;
-const UL_UPLOAD_DATA    = 0x01;
-const UL_UPLOAD_DECODER = 0x02;
-const UL_UPLOAD_ENCODER = 0x03;
-const UL_UPLOAD_CONFIG  = 0x04;
+const UL_UPLOAD_CONFIG  = 0x02;
+const UL_UPLOAD_DECODER = 0x03;
+const UL_UPLOAD_ENCODER = 0x04;
 const UL_UPLOAD_STATS   = 0x05;
+const UL_UPLOAD_DATA    = 0x06;
 const FLAG_POLL_VALUE   = 0x01;
 const FLAG_ACK_VALUE    = 0x02;
 
@@ -96,7 +96,7 @@ server.on("message", async (msg, rinfo) => {
         return;
       }
 
-      if ([UL_UPLOAD_DECODER, UL_UPLOAD_ENCODER, UL_UPLOAD_CONFIG, UL_UPLOAD_STATS].includes(msgType)) {
+      if ([UL_UPLOAD_CONFIG, UL_UPLOAD_DECODER, UL_UPLOAD_ENCODER, UL_UPLOAD_STATS].includes(msgType)) {
         console.log(`[Server] Upload type 0x${msgType.toString(16).padStart(2,'0')} — sending ACK`);
         const ack = packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null);
         server.send(ack, rinfo.port, rinfo.address, (err) => {
