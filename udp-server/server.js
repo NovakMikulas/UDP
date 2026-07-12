@@ -1,7 +1,8 @@
 import dgram from "dgram";
 import dotenv from "dotenv";
 import cbor from "cbor";
-import { unpackPacket, packResponse, FLAG_ACK, FLAG_LAST, FLAG_FIRST, FLAG_POLL } from "./services/validator.js";
+import { unpackPacket, packResponse, FLAG_ACK, FLAG_FIRST, FLAG_LAST, FLAG_POLL } from "./services/validator.js";
+
 dotenv.config();
 
 const server = dgram.createSocket("udp4");
@@ -12,27 +13,23 @@ const UL_CREATE_SESSION = 0x00;
 const UL_UPLOAD_DATA = 0x01;
 const FLAG_POLL_VALUE = 0x01;
 
+const uint64_zero = Buffer.from([0x1b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+
 function buildSessionResponse(serialNumber, sequence) {
-  const sessionType = Buffer.alloc(1);
-  sessionType[0] = DL_SET_SESSION;
+  const sessionType = Buffer.from([DL_SET_SESSION]);
+  const timestamp = Math.floor(Date.now() / 1000);
 
-  // Ručně sestav indefinite-length CBOR mapu
-  const items = [
-    [0x00, 1],                                    // id = 1 (uint)
-    [0x01, BigInt(0)],                            // decoder_hash (uint64)
-    [0x02, BigInt(0)],                            // encoder_hash (uint64)
-    [0x03, BigInt(0)],                            // config_hash (uint64)
-    [0x04, Math.floor(Date.now() / 1000)],        // timestamp (int)
-    [0x05, "custom-server"],                      // device_id
-    [0x06, "UDP Server"],                         // device_name
+  const parts = [
+    Buffer.from([0xbf]),
+    cbor.encode(0x00), cbor.encode(1),
+    cbor.encode(0x01), uint64_zero,
+    cbor.encode(0x02), uint64_zero,
+    cbor.encode(0x03), uint64_zero,
+    cbor.encode(0x04), cbor.encode(timestamp),
+    cbor.encode(0x05), cbor.encode("custom-server"),
+    cbor.encode(0x06), cbor.encode("UDP Server"),
+    Buffer.from([0xff]),
   ];
-
-  const parts = [Buffer.from([0xbf])]; // indefinite map start
-  for (const [k, v] of items) {
-    parts.push(cbor.encode(k));
-    parts.push(cbor.encode(v));
-  }
-  parts.push(Buffer.from([0xff])); // break
 
   const cborData = Buffer.concat(parts);
   const data = Buffer.concat([sessionType, cborData]);
@@ -65,10 +62,7 @@ server.on("message", async (msg, rinfo) => {
 
       if (msgType === UL_CREATE_SESSION) {
         console.log("[Server] Session create — sending ACK+POLL");
-        // ACK bez FLAG_LAST + POLL flag = mám downlink
         const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null);
-        console.log("[Server] ACK+POLL hex:", ack.toString("hex"));
-        console.log("[Server] ACK+POLL length:", ack.length);
         server.send(ack, rinfo.port, rinfo.address, (err) => {
           if (err) console.error("[Server] ACK+POLL failed:", err.message);
           else console.log("[Server] ACK+POLL sent");
@@ -77,16 +71,15 @@ server.on("message", async (msg, rinfo) => {
       }
 
       if (msgType === UL_UPLOAD_DATA) {
-        console.log("[Server] Data packet received, data_len:", packet.data.length);
-        console.log("[Server] Data hex:", packet.data.toString("hex"));
+        console.log("[Server] ✅ DATA PACKET received!");
+        console.log("[Server] Full data hex:", packet.data.toString("hex"));
       }
     }
 
-    // POLL request — prázdný paket s POLL flagem
+    // POLL request
     if (packet.flags & FLAG_POLL_VALUE && (!packet.data || packet.data.length === 0)) {
       console.log("[Server] POLL request — sending session data");
       const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
-      console.log("[Server] Session data hex:", sessionResp.toString("hex"));
       server.send(sessionResp, rinfo.port, rinfo.address, (err) => {
         if (err) console.error("[Server] Session data failed:", err.message);
         else console.log("[Server] Session data sent");
@@ -94,7 +87,7 @@ server.on("message", async (msg, rinfo) => {
       return;
     }
 
-    // Standardní ACK bez FLAG_LAST
+    // Standardní ACK
     const ack = packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null);
     server.send(ack, rinfo.port, rinfo.address, (err) => {
       if (err) console.error("[Server] ACK failed:", err.message);
