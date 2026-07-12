@@ -29,7 +29,8 @@ function buildSessionResponse(serialNumber, sequence) {
   const cborData = cbor.encode(map);
   const data = Buffer.concat([sessionType, cborData]);
 
-  return packResponse(serialNumber, FLAG_ACK | FLAG_LAST, sequence, data);
+  // Downlink data — FLAG_FIRST + FLAG_LAST (ne ACK)
+  return packResponse(serialNumber, FLAG_FIRST | FLAG_LAST, sequence, data);
 }
 
 server.on("listening", () => {
@@ -47,14 +48,17 @@ server.on("message", async (msg, rinfo) => {
   try {
     const packet = unpackPacket(msg);
     const ackSequence = packet.sequence + 1;
-    console.log(`[Server] Flags: ${packet.flags.toString(2).padStart(4, '0')}, data_len: ${packet.data.length}`);
+
+    console.log(`[Server] Flags: ${packet.flags.toString(2).padStart(4, '0')}, seq: ${packet.sequence}, data_len: ${packet.data.length}`);
+
     if (packet.data && packet.data.length > 0) {
       const msgType = packet.data[0];
       console.log(`[Server] Message type: 0x${msgType.toString(16)}`);
 
       if (msgType === UL_CREATE_SESSION) {
         console.log("[Server] Session create — sending ACK+POLL");
-        const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_LAST | FLAG_POLL, ackSequence, null);
+        // ACK bez FLAG_LAST + POLL flag = mám downlink
+        const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null);
         server.send(ack, rinfo.port, rinfo.address, (err) => {
           if (err) console.error("[Server] ACK+POLL failed:", err.message);
           else console.log("[Server] ACK+POLL sent");
@@ -78,8 +82,9 @@ server.on("message", async (msg, rinfo) => {
       });
       return;
     }
-    console.log(`[Server] Unhandled packet: flags=${packet.flags.toString(2).padStart(4, '0')}, data_len=${packet.data.length}`);
-    const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_LAST, ackSequence, null);
+
+    // Standardní ACK bez FLAG_LAST
+    const ack = packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null);
     server.send(ack, rinfo.port, rinfo.address, (err) => {
       if (err) console.error("[Server] ACK failed:", err.message);
       else console.log(`[Server] ACK sent, seq=${ackSequence}`);
