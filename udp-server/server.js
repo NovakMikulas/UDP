@@ -16,19 +16,27 @@ function buildSessionResponse(serialNumber, sequence) {
   const sessionType = Buffer.alloc(1);
   sessionType[0] = DL_SET_SESSION;
 
-  const map = new Map();
-  map.set(0x00, 1);
-  map.set(0x01, 0);
-  map.set(0x02, 0);
-  map.set(0x03, 0);
-  map.set(0x04, Math.floor(Date.now() / 1000));
-  map.set(0x05, "custom-server");
-  map.set(0x06, "UDP Server");
+  // Ručně sestav indefinite-length CBOR mapu
+  const items = [
+    [0x00, 1],                                    // id = 1 (uint)
+    [0x01, BigInt(0)],                            // decoder_hash (uint64)
+    [0x02, BigInt(0)],                            // encoder_hash (uint64)
+    [0x03, BigInt(0)],                            // config_hash (uint64)
+    [0x04, Math.floor(Date.now() / 1000)],        // timestamp (int)
+    [0x05, "custom-server"],                      // device_id
+    [0x06, "UDP Server"],                         // device_name
+  ];
 
-  const cborData = cbor.encode(map);
+  const parts = [Buffer.from([0xbf])]; // indefinite map start
+  for (const [k, v] of items) {
+    parts.push(cbor.encode(k));
+    parts.push(cbor.encode(v));
+  }
+  parts.push(Buffer.from([0xff])); // break
+
+  const cborData = Buffer.concat(parts);
   const data = Buffer.concat([sessionType, cborData]);
 
-  // Downlink data — FLAG_FIRST + FLAG_LAST (ne ACK)
   return packResponse(serialNumber, FLAG_FIRST | FLAG_LAST, sequence, data);
 }
 
