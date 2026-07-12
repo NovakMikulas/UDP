@@ -21,7 +21,6 @@ function calculateHash(data) {
 }
 
 export function unpackPacket(msg) {
-  // Dekóduj base64
   const binary = Buffer.from(msg.toString("ascii"), "base64");
 
   if (binary.length < 14) {
