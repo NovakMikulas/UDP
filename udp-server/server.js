@@ -1,8 +1,7 @@
 import dgram from "dgram";
 import dotenv from "dotenv";
 import cbor from "cbor";
-import { unpackPacket, packResponse, FLAG_ACK, FLAG_LAST, FLAG_POLL } from "./services/validator.js";
-
+import { unpackPacket, packResponse, FLAG_ACK, FLAG_LAST, FLAG_FIRST, FLAG_POLL } from "./services/validator.js";
 dotenv.config();
 
 const server = dgram.createSocket("udp4");
