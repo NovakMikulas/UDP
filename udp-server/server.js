@@ -19,10 +19,10 @@ function buildSessionResponse(serialNumber, sequence) {
 
   const map = new Map();
   map.set(0x00, 1);
-  map.set(0x01, BigInt(0));
-  map.set(0x02, BigInt(0));
-  map.set(0x03, BigInt(0));
-  map.set(0x04, BigInt(Math.floor(Date.now() / 1000)));
+  map.set(0x01, 0);
+  map.set(0x02, 0);
+  map.set(0x03, 0);
+  map.set(0x04, Math.floor(Date.now() / 1000));
   map.set(0x05, "custom-server");
   map.set(0x06, "UDP Server");
 
@@ -66,11 +66,9 @@ server.on("message", async (msg, rinfo) => {
       if (msgType === UL_UPLOAD_DATA) {
         console.log("[Server] Data packet received, data_len:", packet.data.length);
         console.log("[Server] Data hex:", packet.data.toString("hex"));
-        // TODO: dekódovat CBOR a poslat webhook
       }
     }
 
-    // Standardní ACK
     const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_LAST, ackSequence, null);
     server.send(ack, rinfo.port, rinfo.address, (err) => {
       if (err) console.error("[Server] ACK failed:", err.message);
