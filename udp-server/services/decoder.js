@@ -1,15 +1,13 @@
+// services/decoder.js
 import cbor from "cbor";
 import { mapValue } from "./map-value.js";
 
-const LEN_SIZE = 2;
-const HASH_SIZE = 6;
-const SERIAL_NUMBER_SIZE = 4;
-const LEN_HASH_SIZE = LEN_SIZE + HASH_SIZE;
-const HEADER_SIZE = LEN_HASH_SIZE + SERIAL_NUMBER_SIZE;
-
-export const decodeMessage = async (msg) => {
-  const serialNumber = msg.readUInt32LE(LEN_HASH_SIZE);
-  const raw = msg.slice(HEADER_SIZE);
+// data = packet.data z Cloud v2 protokolu
+// Byte 0: 0x06 (UL_UPLOAD_DATA)
+// Byty 1-8: decoder_hash
+// Zbytek: CBOR payload
+export const decodeMessage = async (data, serialNumber) => {
+  const raw = data.slice(9); // přeskoč type(1) + decoder_hash(8)
   try {
     const decoder = new cbor.Decoder({ mapsAsObjects: false });
     const chunks = [];
@@ -24,8 +22,8 @@ export const decodeMessage = async (msg) => {
     const decoded = mapValue(rawDecoded);
 
     console.log(
-      `[Decoder] Raw data from device ${serialNumber}:`,
-      JSON.stringify(decoded),
+      `[Decoder] Data from device ${serialNumber}:`,
+      JSON.stringify(decoded)
     );
 
     return {
@@ -35,7 +33,7 @@ export const decodeMessage = async (msg) => {
   } catch (error) {
     console.error(
       `[Decoder] Failed for device ${serialNumber}:`,
-      error.message,
+      error.message
     );
     throw error;
   }

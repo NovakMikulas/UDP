@@ -2,6 +2,8 @@ import dgram from "dgram";
 import dotenv from "dotenv";
 import cbor from "cbor";
 import { unpackPacket, packResponse, FLAG_ACK, FLAG_FIRST, FLAG_LAST, FLAG_POLL } from "./services/validator.js";
+import { decodeMessage } from "./services/decoder.js";
+import { sendWebhook } from "./services/webhook.js";
 
 dotenv.config();
 
@@ -108,7 +110,8 @@ server.on("message", async (msg, rinfo) => {
 
       if (msgType === UL_UPLOAD_DATA) {
         console.log("[Server] ✅ DATA PACKET received!");
-        console.log("[Server] Full data hex:", packet.data.toString("hex"));
+        const processedData = await decodeMessage(packet.data, packet.serialNumber);
+        await sendWebhook(processedData);
         const ack = packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null);
         server.send(ack, rinfo.port, rinfo.address, (err) => {
           if (err) console.error("[Server] ACK failed:", err.message);
