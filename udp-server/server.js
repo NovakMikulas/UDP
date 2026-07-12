@@ -58,6 +58,8 @@ server.on("message", async (msg, rinfo) => {
         console.log("[Server] Session create — sending ACK+POLL");
         // ACK bez FLAG_LAST + POLL flag = mám downlink
         const ack = packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null);
+        console.log("[Server] ACK+POLL hex:", ack.toString("hex"));
+        console.log("[Server] ACK+POLL length:", ack.length);
         server.send(ack, rinfo.port, rinfo.address, (err) => {
           if (err) console.error("[Server] ACK+POLL failed:", err.message);
           else console.log("[Server] ACK+POLL sent");
