@@ -52,7 +52,8 @@ server.on("message", async (msg, rinfo) => {
 
     if (packet.data && packet.data.length > 0) {
       const msgType = packet.data[0];
-      console.log(`[Server] Message type: 0x${msgType.toString(16)}`);
+      console.log(`[Server] Message type: 0x${msgType.toString(16).padStart(2, '0')}, data_len: ${packet.data.length}`);
+      console.log(`[Server] Data hex (first 20 bytes): ${packet.data.slice(0, 20).toString("hex")}`);
 
       if (msgType === UL_CREATE_SESSION) {
         console.log("[Server] Session create — sending ACK+POLL");
