@@ -12,6 +12,7 @@ const DL_SET_SESSION = 0x00;
 const UL_CREATE_SESSION = 0x00;
 const UL_UPLOAD_DATA = 0x01;
 const FLAG_POLL_VALUE = 0x01;
+const FLAG_ACK_VALUE = 0x02;
 
 function buildSessionResponse(serialNumber, sequence) {
   const sessionType = Buffer.from([DL_SET_SESSION]);
@@ -59,6 +60,12 @@ server.on("message", async (msg, rinfo) => {
 
     console.log(`[Server] Flags: ${packet.flags.toString(2).padStart(4, '0')}, seq: ${packet.sequence}, data_len: ${packet.data.length}`);
 
+    // Ignoruj ACK pakety od zařízení
+    if (packet.flags === FLAG_ACK_VALUE && packet.data.length === 0) {
+      console.log("[Server] Device ACK — ignoring");
+      return;
+    }
+
     if (packet.data && packet.data.length > 0) {
       const msgType = packet.data[0];
       console.log(`[Server] Message type: 0x${msgType.toString(16).padStart(2, '0')}, data_len: ${packet.data.length}`);
@@ -81,7 +88,7 @@ server.on("message", async (msg, rinfo) => {
     }
 
     // POLL request
-    if (packet.flags & FLAG_POLL_VALUE && (!packet.data || packet.data.length === 0)) {
+    if (packet.flags & FLAG_POLL_VALUE && packet.data.length === 0) {
       console.log("[Server] POLL request — sending session data");
       const sessionResp = buildSessionResponse(packet.serialNumber, ackSequence);
       console.log("[Server] Session data hex:", sessionResp.toString("hex"));
