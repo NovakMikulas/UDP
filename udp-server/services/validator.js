@@ -4,7 +4,7 @@ const HASH_SIZE = 6;
 const LEN_HASH_SIZE = (LEN_SIZE + HASH_SIZE);
 
 export const validateMessage = async (msg) => {
-
+    console.log(`[Validator] Received packet, length: ${msg.length}, hex: ${msg.toString('hex')}`);
     try {
         if (msg.readUInt16LE(0) !== msg.length) {
             throw new Error('Length field does not match');
