@@ -4,6 +4,7 @@ import { messageService } from "../../../api/services/message";
 import { useToast } from "../../../context/ToastContext";
 import socket from "../../../api/socket";
 import Table from "../../../components/ui/Table/Table";
+import Modal from "../../../components/ui/Modal/Modal";
 import Breadcrumb from "../../../components/ui/Breadcrumb/Breadcrumb";
 import { voltageStatus } from "../../../constants/voltage";
 import "./MessageList.css";
@@ -36,8 +37,8 @@ const columns = [
   { header: "Voltage",      render: (msg) => voltageStatus(msg.system?.voltage_rest) },
 ];
 
-const MsgCard = ({ msg }) => (
-  <div className="msg-card">
+const MsgCard = ({ msg, onClick }) => (
+  <div className="msg-card" onClick={onClick}>
     <div className="msg-card__time">{new Date(msg.createdAt).toLocaleString()}</div>
     <div className="msg-card__rows">
       <div className="msg-card__row">
@@ -77,6 +78,7 @@ const MessageList = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia("(max-width: 768px)").matches);
+  const [selectedMessage, setSelectedMessage] = useState(null);
   const pageRef = useRef(1);
 
   useEffect(() => {
@@ -139,7 +141,7 @@ const MessageList = () => {
         <div className="msg-card-list" onScroll={handleScroll}>
           {loading && <p className="msg-card-list__state">Loading…</p>}
           {!loading && messages.length === 0 && <p className="msg-card-list__state">No messages found.</p>}
-          {messages.map((msg) => <MsgCard key={msg._id} msg={msg} />)}
+          {messages.map((msg) => <MsgCard key={msg._id} msg={msg} onClick={() => setSelectedMessage(msg)} />)}
           {loadingMore && <p className="msg-card-list__state">Loading more messages…</p>}
         </div>
       ) : (
@@ -149,9 +151,20 @@ const MessageList = () => {
           loading={loading}
           emptyMessage="No messages found."
           onScroll={handleScroll}
+          onRowClick={setSelectedMessage}
           footer={loadingMore ? "Loading more messages…" : null}
         />
       )}
+
+      <Modal isOpen={!!selectedMessage} onClose={() => setSelectedMessage(null)} title="Message details">
+        <pre className="message-json">
+          {selectedMessage && JSON.stringify(
+            (({ motionLeftDelta, motionRightDelta, ...raw }) => raw)(selectedMessage),
+            null,
+            2
+          )}
+        </pre>
+      </Modal>
     </div>
   );
 };

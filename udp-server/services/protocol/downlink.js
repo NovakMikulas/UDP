@@ -27,7 +27,7 @@ export function buildDownlink(processedData) {
   const profile = PROFILES[level];
 
   console.log(
-    `[Downlink] Voltage ${voltage}V (${level}) — applying profile for device ${serialNumber}`
+    `[Downlink] Voltage ${voltage}V (${level}) - applying profile for device ${serialNumber}`
   );
 
   const commands = [
