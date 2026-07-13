@@ -12,9 +12,10 @@ import {
     UL_UPLOAD_DATA,
 } from "./packet.js";
 import { buildSessionResponse } from "./session.js";
-import { buildDownlink } from "./downlink.js";
+import { buildDownlink, buildConfigDownlink } from "./downlink.js";
 import { decodeMessage } from "../decoder/index.js";
 import { sendWebhook } from "../webhook.js";
+import { consumePendingConfig } from "../device-config.js";
 
 // Pending downlinks per device - keyed by serialNumber
 const pendingDownlinks = new Map();
@@ -55,7 +56,13 @@ export async function handlePacket(packet, send) {
             console.log("[Router] voltage_rest:", processedData.system?.voltage_rest);
             await sendWebhook(processedData);
 
-            const downlink = buildDownlink(processedData);
+            // A user-queued config (set via the frontend) takes priority over the
+            // automatic voltage-based profile if both happen to be due at once.
+            const pendingConfig = await consumePendingConfig(packet.serialNumber);
+            const downlink = pendingConfig
+                ? buildConfigDownlink(pendingConfig)
+                : buildDownlink(processedData);
+
             if (downlink) {
                 pendingDownlinks.set(packet.serialNumber, downlink);
                 console.log(`[Router] Downlink queued for device ${packet.serialNumber}`);

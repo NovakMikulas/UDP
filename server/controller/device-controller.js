@@ -4,6 +4,8 @@ import deviceGetAbl from "../abl/device/device-get-abl.js";
 import deviceUpdateAbl from "../abl/device/device-update-abl.js";
 import deviceListAbl from "../abl/device/device-list-abl.js";
 import deviceListAllAbl from "../abl/device/device-listAll-abl.js";
+import deviceSetConfigAbl from "../abl/device/device-setConfig-abl.js";
+import deviceGetConfigAbl from "../abl/device/device-getConfig-abl.js";
 export const deviceController = {
   create: async (req, res, next) => {
     try {
@@ -59,6 +61,24 @@ export const deviceController = {
       const userId = req.user.id;
       const devices = await deviceListAllAbl(userId);
       res.status(200).json({ status: "success", data: devices });
+    } catch (error) {
+      next(error);
+    }
+  },
+  getConfig: async (req, res, next) => {
+    try {
+      const id = req.params.deviceId;
+      const pendingConfig = await deviceGetConfigAbl(id);
+      res.status(200).json({ status: "success", data: pendingConfig });
+    } catch (error) {
+      next(error);
+    }
+  },
+  setConfig: async (req, res, next) => {
+    try {
+      const data = { ...req.body, id: req.params.deviceId };
+      const updated = await deviceSetConfigAbl(data);
+      res.status(200).json({ status: "success", data: updated.pendingConfig ?? null });
     } catch (error) {
       next(error);
     }

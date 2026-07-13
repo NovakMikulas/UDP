@@ -2,6 +2,7 @@ import dgram from "dgram";
 import dotenv from "dotenv";
 dotenv.config();
 
+import { connectDb } from "./services/db.js";
 import { unpackPacket } from "./services/protocol/packet.js";
 import { handlePacket } from "./services/protocol/router.js";
 
@@ -17,6 +18,7 @@ server.on("error", (err) => {
   server.close();
 });
 
+await connectDb();
 server.bind(PORT);
 
 server.on("message", async (msg, rinfo) => {

@@ -7,6 +7,8 @@ const deviceSchema = new Schema(
     serialNumber: { type: String, required: true, unique: true },
     // motion_left counts entries by default; flip this if the sensor is mounted facing the other way
     invertDirection: { type: Boolean, default: false },
+    // Config queued from the frontend, applied and cleared by udp-server on the device's next connection
+    pendingConfig: { type: Schema.Types.Mixed, default: undefined },
   },
   { timestamps: true },
 );

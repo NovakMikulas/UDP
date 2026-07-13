@@ -41,4 +41,18 @@ router.delete(
   deviceController.delete,
 );
 
+router.get(
+  "/:deviceId/config",
+  authMiddleware,
+  authorizeMiddleware(["Owner", "Member"]),
+  deviceController.getConfig,
+);
+
+router.put(
+  "/:deviceId/config",
+  authMiddleware,
+  authorizeMiddleware(["Owner"]),
+  deviceController.setConfig,
+);
+
 export default router;

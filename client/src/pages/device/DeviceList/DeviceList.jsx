@@ -4,6 +4,7 @@ import { deviceService } from "../../../api/services/device";
 import { useToast } from "../../../context/ToastContext";
 import { OFFLINE_THRESHOLD_MS } from "../../../constants/device";
 import { voltageStatus, isVoltageAlive } from "../../../constants/voltage";
+import { EMPTY_DEVICE_CONFIG, CONFIG_FIELDS } from "../../../constants/deviceConfig";
 import { messageService } from "../../../api/services/message";
 import Button from "../../../components/ui/Button/Button";
 import Input from "../../../components/ui/Input/Input";
@@ -16,6 +17,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import useCrudModal from "../../../hooks/useCrudModal";
 import "./DeviceList.css";
 
@@ -31,6 +33,10 @@ const DeviceList = () => {
   const [search, setSearch] = useState("");
   const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false });
   const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false });
+  const [configOpen, setConfigOpen] = useState(false);
+  const [configDevice, setConfigDevice] = useState(null);
+  const [configForm, setConfigForm] = useState(EMPTY_DEVICE_CONFIG);
+  const [configLoading, setConfigLoading] = useState(false);
   const { addToast } = useToast();
 
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
@@ -123,7 +129,59 @@ const DeviceList = () => {
     }
   };
 
+  const handleOpenConfig = async (device) => {
+    setConfigDevice(device);
+    setConfigForm(EMPTY_DEVICE_CONFIG);
+    setConfigOpen(true);
+    setConfigLoading(true);
+    try {
+      const res = await deviceService.getConfig(device._id, locationId);
+      const pending = res.data || {};
+      setConfigForm({
+        ...EMPTY_DEVICE_CONFIG,
+        ...Object.fromEntries(Object.entries(pending).map(([key, value]) => [key, String(value)])),
+      });
+    } catch {
+      addToast("Failed to load current configuration.", "error");
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const closeConfig = () => {
+    setConfigOpen(false);
+    setConfigDevice(null);
+  };
+
+  const handleSubmitConfig = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {};
+      for (const field of CONFIG_FIELDS) {
+        const value = configForm[field.key];
+        if (value === "") continue;
+        payload[field.key] = field.select ? value : Number(value);
+      }
+      await deviceService.setConfig(configDevice._id, locationId, payload);
+      closeConfig();
+      fetchDevices();
+      addToast("Configuration queued for the next device connection.", "success");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to save configuration.", "error");
+    }
+  };
+
   const getMenuItems = (device) => [
+    {
+      label: (
+        <span className="action-menu__label">
+          Configure
+          {device.pendingConfig && <span className="menu-item__badge" title="Configuration pending" />}
+        </span>
+      ),
+      icon: <SettingsOutlinedIcon fontSize="small" />,
+      onClick: () => handleOpenConfig(device),
+    },
     { label: "Update", icon: <EditOutlinedIcon fontSize="small" />, onClick: () => handleOpenUpdate(device) },
     { label: "Delete", icon: <DeleteOutlineIcon fontSize="small" />, onClick: () => openDelete(device), variant: "danger" },
   ];
@@ -215,6 +273,47 @@ const DeviceList = () => {
             Flip direction (sensor mounted facing the other way)
           </label>
           <Button type="submit" variant="success" fullWidth>Save changes</Button>
+        </form>
+      </Modal>
+
+      <Modal isOpen={configOpen} onClose={closeConfig} title="Configure device">
+        <form onSubmit={handleSubmitConfig} className="modal-form">
+          <p className="modal-notice">Configuration will be applied on the next device connection.</p>
+          {configLoading ? (
+            <p>Loading current configuration…</p>
+          ) : (
+            <>
+              {CONFIG_FIELDS.filter((field) => !field.advanced || configForm.sensitivity === "individual").map((field) => (
+                field.select ? (
+                  <div className="input-group" key={field.key}>
+                    <label htmlFor={field.key}>{field.label}</label>
+                    <select
+                      id={field.key}
+                      value={configForm[field.key]}
+                      onChange={(e) => setConfigForm({ ...configForm, [field.key]: e.target.value })}
+                    >
+                      <option value="">—</option>
+                      {field.select.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                    <p className="input-hint">{field.hint}</p>
+                  </div>
+                ) : (
+                  <Input
+                    key={field.key}
+                    id={field.key}
+                    label={field.label}
+                    type="number"
+                    min={field.min}
+                    max={field.max}
+                    value={configForm[field.key]}
+                    onChange={(e) => setConfigForm({ ...configForm, [field.key]: e.target.value })}
+                    hint={field.hint}
+                  />
+                )
+              ))}
+              <Button type="submit" variant="success" fullWidth>Save configuration</Button>
+            </>
+          )}
         </form>
       </Modal>
 
