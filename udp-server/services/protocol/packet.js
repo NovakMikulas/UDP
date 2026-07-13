@@ -1,4 +1,3 @@
-// services/validator.js
 import crypto from "crypto";
 
 const CLAIM_TOKEN = Buffer.from(process.env.CLAIM_TOKEN || "f015d4fd88acb9f11ff7c68807603b33", "hex");
@@ -7,6 +6,14 @@ export const FLAG_FIRST = 0x08;
 export const FLAG_LAST  = 0x04;
 export const FLAG_ACK   = 0x02;
 export const FLAG_POLL  = 0x01;
+
+export const DL_SET_SESSION    = 0x80;
+export const UL_CREATE_SESSION = 0x00;
+export const UL_UPLOAD_CONFIG  = 0x02;
+export const UL_UPLOAD_DECODER = 0x03;
+export const UL_UPLOAD_ENCODER = 0x04;
+export const UL_UPLOAD_STATS   = 0x05;
+export const UL_UPLOAD_DATA    = 0x06;
 
 function calculateHash(data) {
   const h = crypto.createHash("sha256");
@@ -39,8 +46,6 @@ export function unpackPacket(msg) {
   const flags = (header >> 12) & 0x0F;
   const sequence = header & 0x0FFF;
   const data = binary.slice(14);
-
-  console.log(`[Validator] Valid packet: serial=${serialNumber}, flags=${flags.toString(2).padStart(4,'0')}, seq=${sequence}, data_len=${data.length}`);
 
   return { serialNumber, flags, sequence, data, binary };
 }
