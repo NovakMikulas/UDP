@@ -1,6 +1,8 @@
 import {
     packResponse,
     FLAG_ACK,
+    FLAG_FIRST,
+    FLAG_LAST,
     FLAG_POLL,
     UL_CREATE_SESSION,
     UL_UPLOAD_CONFIG,
@@ -10,22 +12,31 @@ import {
     UL_UPLOAD_DATA,
 } from "./packet.js";
 import { buildSessionResponse } from "./session.js";
+import { buildDownlink } from "./downlink.js";
 import { decodeMessage } from "../decoder/index.js";
 import { sendWebhook } from "../webhook.js";
 
-const UPLOAD_TYPES = [UL_UPLOAD_CONFIG, UL_UPLOAD_DECODER, UL_UPLOAD_ENCODER, UL_UPLOAD_STATS];
+// Pending downlinks per device — keyed by serialNumber
+const pendingDownlinks = new Map();
 
 export async function handlePacket(packet, send) {
     const ackSequence = packet.sequence + 1;
 
-    // Ignore ACK packets from device
+    // Ignoruj ACK pakety od zařízení
     if (packet.flags === FLAG_ACK && packet.data.length === 0) {
         return;
     }
 
-    // POLL request — device requests downlink
+    // POLL request — zařízení žádá o downlink
     if (packet.flags & FLAG_POLL && packet.data.length === 0) {
-        send(buildSessionResponse(packet.serialNumber, ackSequence));
+        const pending = pendingDownlinks.get(packet.serialNumber);
+        if (pending) {
+            pendingDownlinks.delete(packet.serialNumber);
+            console.log(`[Router] Sending pending downlink for device ${packet.serialNumber}`);
+            send(packResponse(packet.serialNumber, FLAG_FIRST | FLAG_LAST, ackSequence, pending));
+        } else {
+            send(buildSessionResponse(packet.serialNumber, ackSequence));
+        }
         return;
     }
 
@@ -44,14 +55,27 @@ export async function handlePacket(packet, send) {
         case UL_UPLOAD_DATA: {
             const processedData = await decodeMessage(packet.data, packet.serialNumber);
             await sendWebhook(processedData);
-            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+
+            const downlink = buildDownlink(processedData);
+            if (downlink) {
+                pendingDownlinks.set(packet.serialNumber, downlink);
+                console.log(`[Router] Downlink queued for device ${packet.serialNumber}`);
+                send(packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null));
+            } else {
+                send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+            }
             break;
         }
 
+        case UL_UPLOAD_CONFIG:
+        case UL_UPLOAD_DECODER:
+        case UL_UPLOAD_ENCODER:
+        case UL_UPLOAD_STATS:
+            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+            break;
+
         default:
-            if (!UPLOAD_TYPES.includes(msgType)) {
-                console.error(`[Router] Unknown message type: 0x${msgType.toString(16).padStart(2, "0")}`);
-            }
+            console.error(`[Router] Unknown message type: 0x${msgType.toString(16).padStart(2, "0")}`);
             send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
             break;
     }
