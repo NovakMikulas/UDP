@@ -21,7 +21,7 @@ export function buildDownlink(processedData) {
   const voltage = processedData.system?.voltage_rest;
   const serialNumber = processedData.serialNumber;
 
-  if (voltage == null || voltage >= VOLTAGE_LOW) return null;
+  if (voltage == null || voltage === 0 || voltage >= VOLTAGE_LOW) return null;
 
   const level = voltage < VOLTAGE_CRITICAL ? "critical" : "low";
   const profile = PROFILES[level];
