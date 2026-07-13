@@ -8,8 +8,9 @@ const schema = {
     roomId: { type: "string" },
     serialNumber: { type: "string" },
     invertDirection: { type: "boolean" },
+    claimToken: { type: "string" },
   },
-  required: ["serialNumber", "roomId"],
+  required: ["serialNumber", "roomId", "claimToken"],
 };
 
 async function deviceCreateAbl(data) {

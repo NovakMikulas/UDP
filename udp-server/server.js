@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { connectDb } from "./services/db.js";
-import { unpackPacket } from "./services/protocol/packet.js";
 import { handlePacket } from "./services/protocol/router.js";
 
 const server = dgram.createSocket("udp4");
@@ -23,8 +22,7 @@ server.bind(PORT);
 
 server.on("message", async (msg, rinfo) => {
   try {
-    const packet = unpackPacket(msg);
-    await handlePacket(packet, (response) => {
+    await handlePacket(msg, (response) => {
       server.send(response, rinfo.port, rinfo.address, (err) => {
         if (err) console.error("[Server] Send failed:", err.message);
       });

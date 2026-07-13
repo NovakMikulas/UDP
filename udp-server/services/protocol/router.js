@@ -1,4 +1,6 @@
 import {
+    peekSerialNumber,
+    unpackPacketWithToken,
     packResponse,
     FLAG_ACK,
     FLAG_FIRST,
@@ -16,11 +18,24 @@ import { buildDownlink, buildConfigDownlink } from "./downlink.js";
 import { decodeMessage } from "../decoder/index.js";
 import { sendWebhook } from "../webhook.js";
 import { consumePendingConfig } from "../device-config.js";
+import { getDevicesCollection } from "../db.js";
 
 // Pending downlinks per device - keyed by serialNumber
 const pendingDownlinks = new Map();
 
-export async function handlePacket(packet, send) {
+export async function handlePacket(msg, send) {
+    const peekedSerialNumber = peekSerialNumber(msg);
+
+    // Each device carries its own claim token (from its QR code), so the
+    // hash can only be verified once we know which device sent this packet.
+    const device = await getDevicesCollection().findOne({ serialNumber: String(peekedSerialNumber) });
+    if (!device || !device.claimToken) {
+        console.warn(`[Router] Rejected packet: no claim token on record for serial ${peekedSerialNumber}`);
+        return;
+    }
+
+    const packet = unpackPacketWithToken(msg, device.claimToken);
+    const claimToken = device.claimToken;
     const ackSequence = packet.sequence + 1;
 
     if (packet.flags === FLAG_ACK && packet.data.length === 0) {
@@ -32,15 +47,15 @@ export async function handlePacket(packet, send) {
         if (pending) {
             pendingDownlinks.delete(packet.serialNumber);
             console.log(`[Router] Sending pending downlink for device ${packet.serialNumber}`);
-            send(packResponse(packet.serialNumber, FLAG_FIRST | FLAG_LAST, ackSequence, pending));
+            send(packResponse(packet.serialNumber, FLAG_FIRST | FLAG_LAST, ackSequence, pending, claimToken));
         } else {
-            send(buildSessionResponse(packet.serialNumber, ackSequence));
+            send(buildSessionResponse(packet.serialNumber, ackSequence, claimToken));
         }
         return;
     }
 
     if (!packet.data || packet.data.length === 0) {
-        send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+        send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null, claimToken));
         return;
     }
 
@@ -48,7 +63,7 @@ export async function handlePacket(packet, send) {
 
     switch (msgType) {
         case UL_CREATE_SESSION:
-            send(packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null));
+            send(packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null, claimToken));
             break;
 
         case UL_UPLOAD_DATA: {
@@ -66,9 +81,9 @@ export async function handlePacket(packet, send) {
             if (downlink) {
                 pendingDownlinks.set(packet.serialNumber, downlink);
                 console.log(`[Router] Downlink queued for device ${packet.serialNumber}`);
-                send(packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null));
+                send(packResponse(packet.serialNumber, FLAG_ACK | FLAG_POLL, ackSequence, null, claimToken));
             } else {
-                send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+                send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null, claimToken));
             }
             break;
         }
@@ -77,12 +92,12 @@ export async function handlePacket(packet, send) {
         case UL_UPLOAD_DECODER:
         case UL_UPLOAD_ENCODER:
         case UL_UPLOAD_STATS:
-            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null, claimToken));
             break;
 
         default:
             console.error(`[Router] Unknown message type: 0x${msgType.toString(16).padStart(2, "0")}`);
-            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null));
+            send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null, claimToken));
             break;
     }
 }
