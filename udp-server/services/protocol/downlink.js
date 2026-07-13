@@ -1,6 +1,6 @@
 import cbor from "cbor";
 
-const VOLTAGE_LOW = 3.6;
+const VOLTAGE_LOW = 3.7;
 const VOLTAGE_CRITICAL = 3.0;
 
 const DL_DOWNLOAD_CONFIG = 0x82;
