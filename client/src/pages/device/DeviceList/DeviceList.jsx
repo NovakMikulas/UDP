@@ -29,8 +29,8 @@ const DeviceList = () => {
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [addForm, setAddForm] = useState({ serialNumber: "" });
-  const [updateForm, setUpdateForm] = useState({ serialNumber: "" });
+  const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false });
+  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false });
   const { addToast } = useToast();
 
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
@@ -85,9 +85,9 @@ const DeviceList = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await deviceService.create(locationId, { serialNumber: addForm.serialNumber, roomId });
+      await deviceService.create(locationId, { serialNumber: addForm.serialNumber, invertDirection: addForm.invertDirection, roomId });
       setAddOpen(false);
-      setAddForm({ serialNumber: "" });
+      setAddForm({ serialNumber: "", invertDirection: false });
       fetchDevices();
       addToast("Device added successfully.", "success");
     } catch (err) {
@@ -96,14 +96,14 @@ const DeviceList = () => {
   };
 
   const handleOpenUpdate = (device) => {
-    setUpdateForm({ serialNumber: device.serialNumber });
+    setUpdateForm({ serialNumber: device.serialNumber, invertDirection: device.invertDirection ?? false });
     openUpdate(device);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await deviceService.update(selected._id, locationId, { serialNumber: updateForm.serialNumber });
+      await deviceService.update(selected._id, locationId, { serialNumber: updateForm.serialNumber, invertDirection: updateForm.invertDirection });
       closeAll();
       fetchDevices();
       addToast("Device updated successfully.", "success");
@@ -189,7 +189,15 @@ const DeviceList = () => {
       <Modal isOpen={addOpen} onClose={closeAll} title="Add device">
         <form onSubmit={handleAdd} className="modal-form">
 
-          <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ serialNumber: e.target.value })} required />
+          <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })} required />
+          <label className="checkbox-field">
+            <input
+              type="checkbox"
+              checked={addForm.invertDirection}
+              onChange={(e) => setAddForm({ ...addForm, invertDirection: e.target.checked })}
+            />
+            Flip direction (sensor mounted facing the other way)
+          </label>
           <Button type="submit" variant="success" fullWidth>Create</Button>
         </form>
       </Modal>
@@ -197,7 +205,15 @@ const DeviceList = () => {
       <Modal isOpen={updateOpen} onClose={closeAll} title="Update device">
         <form onSubmit={handleUpdate} className="modal-form">
 
-          <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ serialNumber: e.target.value })} required />
+          <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })} required />
+          <label className="checkbox-field">
+            <input
+              type="checkbox"
+              checked={updateForm.invertDirection}
+              onChange={(e) => setUpdateForm({ ...updateForm, invertDirection: e.target.checked })}
+            />
+            Flip direction (sensor mounted facing the other way)
+          </label>
           <Button type="submit" variant="success" fullWidth>Save changes</Button>
         </form>
       </Modal>

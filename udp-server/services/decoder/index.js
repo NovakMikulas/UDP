@@ -20,10 +20,6 @@ export const decodeMessage = async (data, serialNumber) => {
     const rawDecoded = chunks[0];
     const decoded = mapValue(rawDecoded);
 
-    console.log(
-      `[Decoder] device ${serialNumber} seq=${decoded.message?.sequence} motion=${JSON.stringify(decoded.motion)}`
-    );
-
     return {
       serialNumber: serialNumber.toString(),
       ...decoded,

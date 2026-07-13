@@ -80,3 +80,12 @@
   gap: var(--spacing-md);
   margin-top: var(--spacing-sm);
 }
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--color-text-primary);
+  font-size: var(--text-base);
+  cursor: pointer;
+}

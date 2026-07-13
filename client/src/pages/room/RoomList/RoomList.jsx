@@ -64,7 +64,9 @@ const RoomList = () => {
                   if (latestMessage) {
                     const totalizer = latestMessage.motion?.totalizer;
                     if (totalizer) {
-                      currentlyInside += Math.max(0, (totalizer.motion_left || 0) - (totalizer.motion_right || 0));
+                      const entries = device.invertDirection ? totalizer.motion_right : totalizer.motion_left;
+                      const exits = device.invertDirection ? totalizer.motion_left : totalizer.motion_right;
+                      currentlyInside += Math.max(0, (entries || 0) - (exits || 0));
                     }
                     const age = Date.now() - new Date(latestMessage.createdAt);
                     if (isVoltageAlive(latestMessage.system?.voltage_rest) && age < OFFLINE_THRESHOLD_MS) {
