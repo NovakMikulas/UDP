@@ -7,7 +7,7 @@
 .input-group label {
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--color-text-muted);
+  color: var(--color-text-primary);
 }
 
 .input-group input,
