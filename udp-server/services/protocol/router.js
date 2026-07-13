@@ -54,6 +54,7 @@ export async function handlePacket(packet, send) {
 
         case UL_UPLOAD_DATA: {
             const processedData = await decodeMessage(packet.data, packet.serialNumber);
+            console.log("[Router] voltage_rest:", processedData.system?.voltage_rest);
             await sendWebhook(processedData);
 
             const downlink = buildDownlink(processedData);
