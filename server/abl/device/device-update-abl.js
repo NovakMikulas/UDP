@@ -12,8 +12,9 @@ const schema = {
     serialNumber: { type: "string" },
     name: { type: "string" },
     invertDirection: { type: "boolean" },
+    claimToken: { type: "string" },
   },
-  required: ["id"],
+  required: ["id", "claimToken"],
   additionalProperties: false,
 };
 

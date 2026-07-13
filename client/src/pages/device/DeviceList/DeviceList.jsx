@@ -34,8 +34,9 @@ const DeviceList = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
-  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false });
+  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [hasCamera, setHasCamera] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
   const [configDevice, setConfigDevice] = useState(null);
   const [configForm, setConfigForm] = useState(EMPTY_DEVICE_CONFIG);
@@ -86,6 +87,14 @@ const DeviceList = () => {
     fetchDevices();
   }, [roomId, locationId]);
 
+  useEffect(() => {
+    if (!navigator.mediaDevices?.enumerateDevices) return;
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((mediaDevices) => setHasCamera(mediaDevices.some((d) => d.kind === "videoinput")))
+      .catch(() => setHasCamera(false));
+  }, []);
+
   const filtered = devices.filter((d) => {
     const q = search.toLowerCase();
     return d.serialNumber?.toLowerCase().includes(q);
@@ -124,14 +133,22 @@ const DeviceList = () => {
   };
 
   const handleOpenUpdate = (device) => {
-    setUpdateForm({ serialNumber: device.serialNumber, invertDirection: device.invertDirection ?? false });
+    setUpdateForm({
+      serialNumber: device.serialNumber,
+      invertDirection: device.invertDirection ?? false,
+      claimToken: device.claimToken ?? "",
+    });
     openUpdate(device);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await deviceService.update(selected._id, locationId, { serialNumber: updateForm.serialNumber, invertDirection: updateForm.invertDirection });
+      await deviceService.update(selected._id, locationId, {
+        serialNumber: updateForm.serialNumber,
+        invertDirection: updateForm.invertDirection,
+        claimToken: updateForm.claimToken,
+      });
       closeAll();
       fetchDevices();
       addToast("Device updated successfully.", "success");
@@ -269,7 +286,13 @@ const DeviceList = () => {
       <Modal isOpen={addOpen} onClose={closeAll} title="Add device">
         <form onSubmit={handleAdd} className="modal-form">
 
-          <Button variant="primary" fullWidth onClick={() => setScannerOpen(true)}>
+          <Button
+            variant="primary"
+            fullWidth
+            disabled={!hasCamera}
+            title={hasCamera ? undefined : "No camera detected on this device"}
+            onClick={() => setScannerOpen(true)}
+          >
             <QrCodeScannerOutlinedIcon fontSize="small" /> Scan QR code
           </Button>
           <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })} required />
@@ -292,6 +315,7 @@ const DeviceList = () => {
         <form onSubmit={handleUpdate} className="modal-form">
 
           <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })} required />
+          <Input id="claimToken" label="Claim token" value={updateForm.claimToken} onChange={(e) => setUpdateForm({ ...updateForm, claimToken: e.target.value })} required />
           <label className="checkbox-field">
             <input
               type="checkbox"
