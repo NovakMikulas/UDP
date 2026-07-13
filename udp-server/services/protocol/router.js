@@ -16,18 +16,16 @@ import { buildDownlink } from "./downlink.js";
 import { decodeMessage } from "../decoder/index.js";
 import { sendWebhook } from "../webhook.js";
 
-// Pending downlinks per device — keyed by serialNumber
+// Pending downlinks per device - keyed by serialNumber
 const pendingDownlinks = new Map();
 
 export async function handlePacket(packet, send) {
     const ackSequence = packet.sequence + 1;
 
-    // Ignoruj ACK pakety od zařízení
     if (packet.flags === FLAG_ACK && packet.data.length === 0) {
         return;
     }
 
-    // POLL request — zařízení žádá o downlink
     if (packet.flags & FLAG_POLL && packet.data.length === 0) {
         const pending = pendingDownlinks.get(packet.serialNumber);
         if (pending) {
