@@ -7,6 +7,7 @@ const schema = {
   properties: {
     roomId: { type: "string" },
     serialNumber: { type: "string" },
+    invertDirection: { type: "boolean" },
   },
   required: ["serialNumber", "roomId"],
 };

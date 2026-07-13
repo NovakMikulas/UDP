@@ -11,6 +11,7 @@ const schema = {
     roomId: { type: "string" },
     serialNumber: { type: "string" },
     name: { type: "string" },
+    invertDirection: { type: "boolean" },
   },
   required: ["id"],
   additionalProperties: false,
