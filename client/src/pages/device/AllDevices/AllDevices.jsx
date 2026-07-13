@@ -107,7 +107,7 @@ const AllDevices = () => {
                     footerLeft={device.serialNumber}
                     footerRight={
                       device.isOnline
-                        ? <><CheckCircleOutlineIcon fontSize="small" />Online</>
+                        ? <span className="card__status--online"><CheckCircleOutlineIcon fontSize="small" />Online</span>
                         : <span className="card__status--offline"><CancelOutlinedIcon fontSize="small" />Offline</span>
                     }
                     onClick={() => locationId && roomId && navigate(

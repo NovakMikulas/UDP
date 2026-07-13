@@ -11,10 +11,26 @@ import "./MessageList.css";
 const PAGE_SIZE = 20;
 const SCROLL_THRESHOLD = 120;
 
+// motion.totalizer is a cumulative lifetime counter on the device, so passages
+// for this report are the delta against the previous (chronologically earlier)
+// message for the same device. messages are sorted newest-first, so the
+// previous report sits at index i + 1.
+function withMotionDeltas(messages) {
+  return messages.map((msg, i) => {
+    const prevTotalizer = messages[i + 1]?.motion?.totalizer;
+    const totalizer = msg.motion?.totalizer;
+    const delta = (key) => {
+      if (!totalizer || !prevTotalizer) return 0;
+      return Math.max(0, (totalizer[key] ?? 0) - (prevTotalizer[key] ?? 0));
+    };
+    return { ...msg, motionLeftDelta: delta("motion_left"), motionRightDelta: delta("motion_right") };
+  });
+}
+
 const columns = [
   { header: "Time",         render: (msg) => new Date(msg.createdAt).toLocaleString() },
-  { header: "Motion Left",  render: (msg) => msg.motion?.totalizer?.motion_left ?? "—" },
-  { header: "Motion Right", render: (msg) => msg.motion?.totalizer?.motion_right ?? "—" },
+  { header: "Motion Left",  render: (msg) => msg.motionLeftDelta },
+  { header: "Motion Right", render: (msg) => msg.motionRightDelta },
   { header: "Temperature",  render: (msg) => msg.thermometer?.temperature != null ? `${msg.thermometer.temperature} °C` : "—" },
   { header: "Samples",      render: (msg) => msg.motion?.samples?.length ?? 0 },
   { header: "Voltage",      render: (msg) => voltageStatus(msg.system?.voltage_rest) },
@@ -26,11 +42,11 @@ const MsgCard = ({ msg }) => (
     <div className="msg-card__rows">
       <div className="msg-card__row">
         <span className="msg-card__label">Motion left</span>
-        <span className="msg-card__value">{msg.motion?.totalizer?.motion_left ?? "—"}</span>
+        <span className="msg-card__value">{msg.motionLeftDelta}</span>
       </div>
       <div className="msg-card__row">
         <span className="msg-card__label">Motion right</span>
-        <span className="msg-card__value">{msg.motion?.totalizer?.motion_right ?? "—"}</span>
+        <span className="msg-card__value">{msg.motionRightDelta}</span>
       </div>
       <div className="msg-card__row">
         <span className="msg-card__label">Samples</span>
@@ -73,7 +89,7 @@ const MessageList = () => {
   const loadPage = (page, append) =>
     messageService.list(deviceId, locationId, page, PAGE_SIZE).then((data) => {
       pageRef.current = page;
-      setMessages((prev) => (append ? [...prev, ...(data.data || [])] : data.data || []));
+      setMessages((prev) => withMotionDeltas(append ? [...prev, ...(data.data || [])] : data.data || []));
       setHasMore(Boolean(data.pagination && data.pagination.page < data.pagination.totalPages));
     });
 
@@ -100,7 +116,7 @@ const MessageList = () => {
     socket.connect();
     socket.on("new_message", (msg) => {
       if (msg.deviceId !== deviceId) return;
-      setMessages((prev) => [msg, ...prev]);
+      setMessages((prev) => withMotionDeltas([msg, ...prev]));
     });
     return () => {
       socket.off("new_message");
