@@ -1,26 +1,17 @@
 import cbor from "cbor";
 
-const VOLTAGE_LOW = 3.3;
+const VOLTAGE_LOW = 3.6;
 const VOLTAGE_CRITICAL = 3.0;
 
-// Numeric keys/values to mirror the uplink CBOR encoding (no confirmed downlink
-// schema exists in the firmware's codec header — CODEC_CLOUD_ENCODER_HASH is empty).
-const DOWNLINK_KEY = {
-  TYPE: 0,
-  LEVEL: 1,
-  INTERVAL_REPORT: 2,
-  INTERVAL_SAMPLE: 3,
-};
-
-const DOWNLINK_TYPE_CONFIG = 0;
-const LEVEL = { LOW: 0, CRITICAL: 1 };
+const DL_DOWNLOAD_CONFIG = 0x82;
+const NOCOMPRESSION = 0x00;
 
 const PROFILES = {
-  [LEVEL.CRITICAL]: {
+  critical: {
     interval_report: 7200,
     interval_sample: 300,
   },
-  [LEVEL.LOW]: {
+  low: {
     interval_report: 3600,
     interval_sample: 120,
   },
@@ -32,17 +23,31 @@ export function buildDownlink(processedData) {
 
   if (voltage == null || voltage >= VOLTAGE_LOW) return null;
 
-  const level = voltage < VOLTAGE_CRITICAL ? LEVEL.CRITICAL : LEVEL.LOW;
+  const level = voltage < VOLTAGE_CRITICAL ? "critical" : "low";
   const profile = PROFILES[level];
 
   console.log(
-    `[Downlink] Voltage ${voltage}V (level=${level}) — applying profile for device ${serialNumber}`,
+    `[Downlink] Voltage ${voltage}V (${level}) — applying profile for device ${serialNumber}`
   );
 
-  return cbor.encode(new Map([
-    [DOWNLINK_KEY.TYPE, DOWNLINK_TYPE_CONFIG],
-    [DOWNLINK_KEY.LEVEL, level],
-    [DOWNLINK_KEY.INTERVAL_REPORT, profile.interval_report],
-    [DOWNLINK_KEY.INTERVAL_SAMPLE, profile.interval_sample],
-  ]));
+  const commands = [
+    `app config interval-report ${profile.interval_report}`,
+    `app config interval-sample ${profile.interval_sample}`,
+    "config save",
+  ];
+
+  const parts = [Buffer.from([0x9f])]; // indefinite array start
+  for (const cmd of commands) {
+    parts.push(cbor.encode(cmd));
+  }
+  parts.push(Buffer.from([0xff])); // break
+
+  const cborData = Buffer.concat(parts);
+  const data = Buffer.concat([
+    Buffer.from([DL_DOWNLOAD_CONFIG]),
+    Buffer.from([NOCOMPRESSION]),
+    cborData,
+  ]);
+
+  return data;
 }
