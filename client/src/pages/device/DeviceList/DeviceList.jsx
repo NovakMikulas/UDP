@@ -11,7 +11,6 @@ import Input from "../../../components/ui/Input/Input";
 import Modal from "../../../components/ui/Modal/Modal";
 import Breadcrumb from "../../../components/ui/Breadcrumb/Breadcrumb";
 import Card from "../../../components/ui/Card/Card";
-import QrScanner from "../../../components/ui/QrScanner/QrScanner";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,7 +18,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
-import QrCodeScannerOutlinedIcon from "@mui/icons-material/QrCodeScannerOutlined";
 import useCrudModal from "../../../hooks/useCrudModal";
 import "./DeviceList.css";
 
@@ -35,8 +33,6 @@ const DeviceList = () => {
   const [search, setSearch] = useState("");
   const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
   const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
-  const [scannerOpen, setScannerOpen] = useState(false);
-  const [hasCamera, setHasCamera] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
   const [configDevice, setConfigDevice] = useState(null);
   const [configForm, setConfigForm] = useState(EMPTY_DEVICE_CONFIG);
@@ -87,14 +83,6 @@ const DeviceList = () => {
     fetchDevices();
   }, [roomId, locationId]);
 
-  useEffect(() => {
-    if (!navigator.mediaDevices?.enumerateDevices) return;
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((mediaDevices) => setHasCamera(mediaDevices.some((d) => d.kind === "videoinput")))
-      .catch(() => setHasCamera(false));
-  }, []);
-
   const filtered = devices.filter((d) => {
     const q = search.toLowerCase();
     return d.serialNumber?.toLowerCase().includes(q);
@@ -116,20 +104,6 @@ const DeviceList = () => {
     } catch (err) {
       addToast(err.response?.data?.message || "Failed to add device.", "error");
     }
-  };
-
-  // CHESTER QR codes encode https://device.hardwario.com/{serialNumber}/{claimToken}/{bleDevAddr}
-  const handleQrScan = (decodedText) => {
-    const parts = decodedText.split("/");
-    const serialNumber = parts[3];
-    const claimToken = parts[4];
-    if (!serialNumber || !claimToken) {
-      addToast("Unrecognized QR code format.", "error");
-      return;
-    }
-    setAddForm({ ...addForm, serialNumber, claimToken });
-    setScannerOpen(false);
-    addToast("Device scanned successfully.", "success");
   };
 
   const handleOpenUpdate = (device) => {
@@ -286,15 +260,6 @@ const DeviceList = () => {
       <Modal isOpen={addOpen} onClose={closeAll} title="Add device">
         <form onSubmit={handleAdd} className="modal-form">
 
-          <Button
-            variant="primary"
-            fullWidth
-            disabled={!hasCamera}
-            title={hasCamera ? undefined : "No camera detected on this device"}
-            onClick={() => setScannerOpen(true)}
-          >
-            <QrCodeScannerOutlinedIcon fontSize="small" /> Scan QR code
-          </Button>
           <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })} required />
           <Input id="claimToken" label="Claim token" value={addForm.claimToken} onChange={(e) => setAddForm({ ...addForm, claimToken: e.target.value })} required />
           <label className="checkbox-field">
@@ -308,8 +273,6 @@ const DeviceList = () => {
           <Button type="submit" variant="success" fullWidth>Create</Button>
         </form>
       </Modal>
-
-      <QrScanner isOpen={scannerOpen} onClose={() => setScannerOpen(false)} onScan={handleQrScan} />
 
       <Modal isOpen={updateOpen} onClose={closeAll} title="Update device">
         <form onSubmit={handleUpdate} className="modal-form">

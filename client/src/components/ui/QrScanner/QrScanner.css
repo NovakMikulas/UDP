@@ -1,6 +1,0 @@
-.qr-scanner__viewport {
-  width: 100%;
-  min-height: 280px;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
