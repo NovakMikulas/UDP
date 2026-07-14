@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { deviceService } from "../../../api/services/device";
+import { roomService } from "../../../api/services/room";
 import { useToast } from "../../../context/ToastContext";
 import { OFFLINE_THRESHOLD_MS } from "../../../constants/device";
 import { voltageStatus, isVoltageAlive } from "../../../constants/voltage";
@@ -29,10 +30,11 @@ const DeviceList = () => {
   const roomName = state?.roomName || roomId;
 
   const [devices, setDevices] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
-  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
+  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "", roomId: "" });
   const [configOpen, setConfigOpen] = useState(false);
   const [configDevice, setConfigDevice] = useState(null);
   const [configForm, setConfigForm] = useState(EMPTY_DEVICE_CONFIG);
@@ -83,6 +85,13 @@ const DeviceList = () => {
     fetchDevices();
   }, [roomId, locationId]);
 
+  useEffect(() => {
+    if (!locationId) return;
+    roomService.list(locationId)
+      .then((res) => setRooms(res.data || []))
+      .catch(() => addToast("Failed to load rooms.", "error"));
+  }, [locationId]);
+
   const filtered = devices.filter((d) => {
     const q = search.toLowerCase();
     return d.serialNumber?.toLowerCase().includes(q);
@@ -111,6 +120,7 @@ const DeviceList = () => {
       serialNumber: device.serialNumber,
       invertDirection: device.invertDirection ?? false,
       claimToken: device.claimToken ?? "",
+      roomId: device.roomId?._id || device.roomId,
     });
     openUpdate(device);
   };
@@ -122,6 +132,7 @@ const DeviceList = () => {
         serialNumber: updateForm.serialNumber,
         invertDirection: updateForm.invertDirection,
         claimToken: updateForm.claimToken,
+        roomId: updateForm.roomId,
       });
       closeAll();
       fetchDevices();
@@ -171,6 +182,7 @@ const DeviceList = () => {
     try {
       const payload = {};
       for (const field of CONFIG_FIELDS) {
+        if (field.advanced && configForm.sensitivity !== "individual") continue;
         const value = configForm[field.key];
         if (value === "") continue;
         payload[field.key] = field.select ? value : Number(value);
@@ -219,7 +231,7 @@ const DeviceList = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="success" onClick={openAdd}>
+        <Button variant="success" onClick={() => openAdd(() => setAddForm({ serialNumber: "", invertDirection: false, claimToken: "" }))}>
           <AddIcon fontSize="small" /> Add device
         </Button>
       </div>
@@ -279,6 +291,17 @@ const DeviceList = () => {
 
           <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })} required />
           <Input id="claimToken" label="Claim token" value={updateForm.claimToken} onChange={(e) => setUpdateForm({ ...updateForm, claimToken: e.target.value })} required />
+          <div className="input-group">
+            <label htmlFor="roomId">Room</label>
+            <select
+              id="roomId"
+              value={updateForm.roomId}
+              onChange={(e) => setUpdateForm({ ...updateForm, roomId: e.target.value })}
+              required
+            >
+              {rooms.map((room) => <option key={room._id} value={room._id}>{room.name}</option>)}
+            </select>
+          </div>
           <label className="checkbox-field">
             <input
               type="checkbox"

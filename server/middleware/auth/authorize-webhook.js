@@ -31,11 +31,13 @@ const authorizeWebhook = (req, res, next) => {
     .update(timestamp + JSON.stringify(req.body))
     .digest("hex");
 
-  // timingSafeEqual to prevent against timing attacks
-  const isValid = crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature),
-  );
+  // timingSafeEqual throws on mismatched buffer lengths, so check that first -
+  // a length mismatch already means the signature is invalid.
+  const signatureBuffer = Buffer.from(signature);
+  const expectedBuffer = Buffer.from(expectedSignature);
+  const isValid =
+    signatureBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
 
   if (!isValid) {
     return next(

@@ -179,7 +179,7 @@ const RoomList = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="success" onClick={openAdd}>
+        <Button variant="success" onClick={() => openAdd(() => setAddForm({ name: "", capacity: "" }))}>
           <AddIcon fontSize="small" /> Add room
         </Button>
       </div>

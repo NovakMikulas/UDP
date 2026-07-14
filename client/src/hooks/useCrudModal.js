@@ -6,7 +6,10 @@ const useCrudModal = () => {
   const [updateOpen, setUpdateOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  const openAdd = () => setAddOpen(true);
+  const openAdd = (resetForm) => {
+    resetForm?.();
+    setAddOpen(true);
+  };
 
   const openUpdate = (item) => {
     setSelected(item);

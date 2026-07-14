@@ -184,7 +184,7 @@ const LocationList = () => {
           <SearchIcon fontSize="small" />
           <input placeholder="Search location..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <Button variant="success" onClick={openAdd}>
+        <Button variant="success" onClick={() => openAdd(() => setAddForm({ name: "", address: emptyAddress }))}>
           <AddIcon fontSize="small" /> Add location
         </Button>
       </div>
