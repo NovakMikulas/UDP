@@ -72,7 +72,7 @@ The claim token can be found by scanning the QR code on the back of the device, 
 https://device.hardwario.com/{serialNumber}/{claimToken}/{bleDevAddr}
 ```
 
-Register the device through the frontend UI using the QR scanner or by entering the serial number and claim token manually.
+Register the device through the frontend UI by entering the serial number and claim token manually.
 
 ## Protocol
 
