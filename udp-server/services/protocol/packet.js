@@ -29,8 +29,7 @@ function calculateHash(data, claimToken) {
   return result;
 }
 
-// Reads the serial number without verifying the hash, so the caller can look
-// up the device's own claim token before full validation is possible.
+
 export function peekSerialNumber(msg) {
   const binary = Buffer.from(msg.toString("ascii"), "base64");
 

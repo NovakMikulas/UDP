@@ -26,8 +26,6 @@ const pendingDownlinks = new Map();
 export async function handlePacket(msg, send) {
     const peekedSerialNumber = peekSerialNumber(msg);
 
-    // Each device carries its own claim token (from its QR code), so the
-    // hash can only be verified once we know which device sent this packet.
     const device = await getDevicesCollection().findOne({ serialNumber: String(peekedSerialNumber) });
     if (!device || !device.claimToken) {
         console.warn(`[Router] Rejected packet: no claim token on record for serial ${peekedSerialNumber}`);
