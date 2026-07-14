@@ -14,6 +14,10 @@ export const UL_UPLOAD_STATS   = 0x05;
 export const UL_UPLOAD_DATA    = 0x06;
 
 function calculateHash(data, claimToken) {
+  if (!/^[0-9a-f]{32}$/.test(claimToken)) {
+    throw new Error(`Invalid claim token: expected 32 lowercase hex characters, got "${claimToken}"`);
+  }
+
   const h = crypto.createHash("sha256");
   h.update(Buffer.from(claimToken, "hex"));
   h.update(data);

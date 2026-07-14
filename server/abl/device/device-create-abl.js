@@ -13,9 +13,9 @@ const schema = {
   type: "object",
   properties: {
     roomId: { type: "string" },
-    serialNumber: { type: "string", pattern: "^[0-9]+$" },
+    serialNumber: { type: "string", pattern: "^[0-9]{10,}$" },
     invertDirection: { type: "boolean" },
-    claimToken: { type: "string" },
+    claimToken: { type: "string", pattern: "^[0-9a-f]{32}$" },
     locationId: { type: "string" },
   },
   required: ["serialNumber", "roomId", "claimToken", "locationId"],

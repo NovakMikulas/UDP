@@ -273,7 +273,16 @@ const DeviceList = () => {
         <form onSubmit={handleAdd} className="modal-form">
 
           <p className="modal-notice">You can find the serial number and claim token by scanning the QR code on the device with your phone's camera or a QR scanner app.</p>
-          <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })} required />
+          <Input
+            id="serialNumber"
+            label="Serial number"
+            value={addForm.serialNumber}
+            onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })}
+            pattern="[0-9]{10,}"
+            minLength={10}
+            title="Serial number must be at least 10 digits"
+            required
+          />
           <Input id="claimToken" label="Claim token" value={addForm.claimToken} onChange={(e) => setAddForm({ ...addForm, claimToken: e.target.value })} required />
           <label className="checkbox-field">
             <input
@@ -291,7 +300,16 @@ const DeviceList = () => {
         <form onSubmit={handleUpdate} className="modal-form">
 
           <p className="modal-notice">You can find the serial number and claim token by scanning the QR code on the device with your phone's camera or a QR scanner app.</p>
-          <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })} required />
+          <Input
+            id="serialNumber"
+            label="Serial number"
+            value={updateForm.serialNumber}
+            onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })}
+            pattern="[0-9]{10,}"
+            minLength={10}
+            title="Serial number must be at least 10 digits"
+            required
+          />
           <Input id="claimToken" label="Claim token" value={updateForm.claimToken} onChange={(e) => setUpdateForm({ ...updateForm, claimToken: e.target.value })} required />
           <div className="input-group">
             <label htmlFor="roomId">Room</label>
