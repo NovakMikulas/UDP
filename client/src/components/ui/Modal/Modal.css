@@ -89,3 +89,12 @@
   font-size: var(--text-base);
   cursor: pointer;
 }
+
+.modal-notice {
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-hover);
+  border-radius: var(--radius);
+  color: var(--color-text-primary);
+  font-size: var(--text-sm);
+}

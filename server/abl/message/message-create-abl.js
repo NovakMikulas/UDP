@@ -13,9 +13,13 @@ const schema = {
     serialNumber: { type: "string" },
     message: { type: "object" },
     system: { type: "object" },
+    network: { type: "object" },
+    thermometer: { type: "object" },
+    accelerometer: { type: "object" },
     motion: { type: "object" },
   },
   required: ["serialNumber", "message", "motion"],
+  additionalProperties: false,
 };
 
 async function messageCreateAbl(data) {

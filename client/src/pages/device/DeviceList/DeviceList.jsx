@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { deviceService } from "../../../api/services/device";
+import { roomService } from "../../../api/services/room";
 import { useToast } from "../../../context/ToastContext";
 import { OFFLINE_THRESHOLD_MS } from "../../../constants/device";
 import { voltageStatus, isVoltageAlive } from "../../../constants/voltage";
+import { EMPTY_DEVICE_CONFIG, CONFIG_FIELDS } from "../../../constants/deviceConfig";
 import { messageService } from "../../../api/services/message";
 import Button from "../../../components/ui/Button/Button";
 import Input from "../../../components/ui/Input/Input";
@@ -16,6 +18,7 @@ import AddIcon from "@mui/icons-material/Add";
 import SearchIcon from "@mui/icons-material/Search";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import useCrudModal from "../../../hooks/useCrudModal";
 import "./DeviceList.css";
 
@@ -27,10 +30,15 @@ const DeviceList = () => {
   const roomName = state?.roomName || roomId;
 
   const [devices, setDevices] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false });
-  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false });
+  const [addForm, setAddForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "" });
+  const [updateForm, setUpdateForm] = useState({ serialNumber: "", invertDirection: false, claimToken: "", roomId: "" });
+  const [configOpen, setConfigOpen] = useState(false);
+  const [configDevice, setConfigDevice] = useState(null);
+  const [configForm, setConfigForm] = useState(EMPTY_DEVICE_CONFIG);
+  const [configLoading, setConfigLoading] = useState(false);
   const { addToast } = useToast();
 
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
@@ -77,6 +85,13 @@ const DeviceList = () => {
     fetchDevices();
   }, [roomId, locationId]);
 
+  useEffect(() => {
+    if (!locationId) return;
+    roomService.list(locationId)
+      .then((res) => setRooms(res.data || []))
+      .catch(() => addToast("Failed to load rooms.", "error"));
+  }, [locationId]);
+
   const filtered = devices.filter((d) => {
     const q = search.toLowerCase();
     return d.serialNumber?.toLowerCase().includes(q);
@@ -85,9 +100,14 @@ const DeviceList = () => {
   const handleAdd = async (e) => {
     e.preventDefault();
     try {
-      await deviceService.create(locationId, { serialNumber: addForm.serialNumber, invertDirection: addForm.invertDirection, roomId });
+      await deviceService.create(locationId, {
+        serialNumber: addForm.serialNumber,
+        invertDirection: addForm.invertDirection,
+        claimToken: addForm.claimToken,
+        roomId,
+      });
       setAddOpen(false);
-      setAddForm({ serialNumber: "", invertDirection: false });
+      setAddForm({ serialNumber: "", invertDirection: false, claimToken: "" });
       fetchDevices();
       addToast("Device added successfully.", "success");
     } catch (err) {
@@ -96,14 +116,24 @@ const DeviceList = () => {
   };
 
   const handleOpenUpdate = (device) => {
-    setUpdateForm({ serialNumber: device.serialNumber, invertDirection: device.invertDirection ?? false });
+    setUpdateForm({
+      serialNumber: device.serialNumber,
+      invertDirection: device.invertDirection ?? false,
+      claimToken: device.claimToken ?? "",
+      roomId: device.roomId?._id || device.roomId,
+    });
     openUpdate(device);
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await deviceService.update(selected._id, locationId, { serialNumber: updateForm.serialNumber, invertDirection: updateForm.invertDirection });
+      await deviceService.update(selected._id, locationId, {
+        serialNumber: updateForm.serialNumber,
+        invertDirection: updateForm.invertDirection,
+        claimToken: updateForm.claimToken,
+        roomId: updateForm.roomId,
+      });
       closeAll();
       fetchDevices();
       addToast("Device updated successfully.", "success");
@@ -123,7 +153,60 @@ const DeviceList = () => {
     }
   };
 
+  const handleOpenConfig = async (device) => {
+    setConfigDevice(device);
+    setConfigForm(EMPTY_DEVICE_CONFIG);
+    setConfigOpen(true);
+    setConfigLoading(true);
+    try {
+      const res = await deviceService.getConfig(device._id, locationId);
+      const pending = res.data || {};
+      setConfigForm({
+        ...EMPTY_DEVICE_CONFIG,
+        ...Object.fromEntries(Object.entries(pending).map(([key, value]) => [key, String(value)])),
+      });
+    } catch {
+      addToast("Failed to load current configuration.", "error");
+    } finally {
+      setConfigLoading(false);
+    }
+  };
+
+  const closeConfig = () => {
+    setConfigOpen(false);
+    setConfigDevice(null);
+  };
+
+  const handleSubmitConfig = async (e) => {
+    e.preventDefault();
+    try {
+      const payload = {};
+      for (const field of CONFIG_FIELDS) {
+        if (field.advanced && configForm.sensitivity !== "individual") continue;
+        const value = configForm[field.key];
+        if (value === "") continue;
+        payload[field.key] = field.select ? value : Number(value);
+      }
+      await deviceService.setConfig(configDevice._id, locationId, payload);
+      closeConfig();
+      fetchDevices();
+      addToast("Configuration queued for the next device connection.", "success");
+    } catch (err) {
+      addToast(err.response?.data?.message || "Failed to save configuration.", "error");
+    }
+  };
+
   const getMenuItems = (device) => [
+    {
+      label: (
+        <span className="action-menu__label">
+          Configure
+          {device.pendingConfig && <span className="menu-item__badge" title="Configuration pending" />}
+        </span>
+      ),
+      icon: <SettingsOutlinedIcon fontSize="small" />,
+      onClick: () => handleOpenConfig(device),
+    },
     { label: "Update", icon: <EditOutlinedIcon fontSize="small" />, onClick: () => handleOpenUpdate(device) },
     { label: "Delete", icon: <DeleteOutlineIcon fontSize="small" />, onClick: () => openDelete(device), variant: "danger" },
   ];
@@ -148,7 +231,7 @@ const DeviceList = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Button variant="success" onClick={openAdd}>
+        <Button variant="success" onClick={() => openAdd(() => setAddForm({ serialNumber: "", invertDirection: false, claimToken: "" }))}>
           <AddIcon fontSize="small" /> Add device
         </Button>
       </div>
@@ -189,7 +272,18 @@ const DeviceList = () => {
       <Modal isOpen={addOpen} onClose={closeAll} title="Add device">
         <form onSubmit={handleAdd} className="modal-form">
 
-          <Input id="serialNumber" label="Serial number" value={addForm.serialNumber} onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })} required />
+          <p className="modal-notice">You can find the serial number and claim token by scanning the QR code on the device with your phone's camera or a QR scanner app.</p>
+          <Input
+            id="serialNumber"
+            label="Serial number"
+            value={addForm.serialNumber}
+            onChange={(e) => setAddForm({ ...addForm, serialNumber: e.target.value })}
+            pattern="[0-9]{10,}"
+            minLength={10}
+            title="Serial number must be at least 10 digits"
+            required
+          />
+          <Input id="claimToken" label="Claim token" value={addForm.claimToken} onChange={(e) => setAddForm({ ...addForm, claimToken: e.target.value })} required />
           <label className="checkbox-field">
             <input
               type="checkbox"
@@ -205,7 +299,29 @@ const DeviceList = () => {
       <Modal isOpen={updateOpen} onClose={closeAll} title="Update device">
         <form onSubmit={handleUpdate} className="modal-form">
 
-          <Input id="serialNumber" label="Serial number" value={updateForm.serialNumber} onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })} required />
+          <p className="modal-notice">You can find the serial number and claim token by scanning the QR code on the device with your phone's camera or a QR scanner app.</p>
+          <Input
+            id="serialNumber"
+            label="Serial number"
+            value={updateForm.serialNumber}
+            onChange={(e) => setUpdateForm({ ...updateForm, serialNumber: e.target.value })}
+            pattern="[0-9]{10,}"
+            minLength={10}
+            title="Serial number must be at least 10 digits"
+            required
+          />
+          <Input id="claimToken" label="Claim token" value={updateForm.claimToken} onChange={(e) => setUpdateForm({ ...updateForm, claimToken: e.target.value })} required />
+          <div className="input-group">
+            <label htmlFor="roomId">Room</label>
+            <select
+              id="roomId"
+              value={updateForm.roomId}
+              onChange={(e) => setUpdateForm({ ...updateForm, roomId: e.target.value })}
+              required
+            >
+              {rooms.map((room) => <option key={room._id} value={room._id}>{room.name}</option>)}
+            </select>
+          </div>
           <label className="checkbox-field">
             <input
               type="checkbox"
@@ -215,6 +331,47 @@ const DeviceList = () => {
             Flip direction (sensor mounted facing the other way)
           </label>
           <Button type="submit" variant="success" fullWidth>Save changes</Button>
+        </form>
+      </Modal>
+
+      <Modal isOpen={configOpen} onClose={closeConfig} title="Configure device">
+        <form onSubmit={handleSubmitConfig} className="modal-form">
+          <p className="modal-notice">Configuration will be applied on the next device connection.</p>
+          {configLoading ? (
+            <p>Loading current configuration…</p>
+          ) : (
+            <>
+              {CONFIG_FIELDS.filter((field) => !field.advanced || configForm.sensitivity === "individual").map((field) => (
+                field.select ? (
+                  <div className="input-group" key={field.key}>
+                    <label htmlFor={field.key}>{field.label}</label>
+                    <select
+                      id={field.key}
+                      value={configForm[field.key]}
+                      onChange={(e) => setConfigForm({ ...configForm, [field.key]: e.target.value })}
+                    >
+                      <option value="">—</option>
+                      {field.select.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+                    </select>
+                    <p className="input-hint">{field.hint}</p>
+                  </div>
+                ) : (
+                  <Input
+                    key={field.key}
+                    id={field.key}
+                    label={field.label}
+                    type="number"
+                    min={field.min}
+                    max={field.max}
+                    value={configForm[field.key]}
+                    onChange={(e) => setConfigForm({ ...configForm, [field.key]: e.target.value })}
+                    hint={field.hint}
+                  />
+                )
+              ))}
+              <Button type="submit" variant="success" fullWidth>Save configuration</Button>
+            </>
+          )}
         </form>
       </Modal>
 

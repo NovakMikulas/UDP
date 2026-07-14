@@ -1,7 +1,5 @@
 import crypto from "crypto";
 
-const CLAIM_TOKEN = Buffer.from(process.env.CLAIM_TOKEN || "f015d4fd88acb9f11ff7c68807603b33", "hex");
-
 export const FLAG_FIRST = 0x08;
 export const FLAG_LAST  = 0x04;
 export const FLAG_ACK   = 0x02;
@@ -15,9 +13,13 @@ export const UL_UPLOAD_ENCODER = 0x04;
 export const UL_UPLOAD_STATS   = 0x05;
 export const UL_UPLOAD_DATA    = 0x06;
 
-function calculateHash(data) {
+function calculateHash(data, claimToken) {
+  if (!/^[0-9a-f]{32}$/.test(claimToken)) {
+    throw new Error(`Invalid claim token: expected 32 lowercase hex characters, got "${claimToken}"`);
+  }
+
   const h = crypto.createHash("sha256");
-  h.update(CLAIM_TOKEN);
+  h.update(Buffer.from(claimToken, "hex"));
   h.update(data);
   const d = h.digest();
   const result = Buffer.alloc(8);
@@ -27,7 +29,18 @@ function calculateHash(data) {
   return result;
 }
 
-export function unpackPacket(msg) {
+
+export function peekSerialNumber(msg) {
+  const binary = Buffer.from(msg.toString("ascii"), "base64");
+
+  if (binary.length < 12) {
+    throw new Error("Packet too short");
+  }
+
+  return binary.readUInt32BE(8);
+}
+
+export function unpackPacketWithToken(msg, claimToken) {
   const binary = Buffer.from(msg.toString("ascii"), "base64");
 
   if (binary.length < 14) {
@@ -35,7 +48,7 @@ export function unpackPacket(msg) {
   }
 
   const receivedHash = binary.slice(0, 8);
-  const calculatedHash = calculateHash(binary.slice(8));
+  const calculatedHash = calculateHash(binary.slice(8), claimToken);
 
   if (!receivedHash.equals(calculatedHash)) {
     throw new Error(`Hash mismatch: expected ${calculatedHash.toString("hex")}, got ${receivedHash.toString("hex")}`);
@@ -50,7 +63,7 @@ export function unpackPacket(msg) {
   return { serialNumber, flags, sequence, data, binary };
 }
 
-export function packResponse(serialNumber, flags, sequence, data) {
+export function packResponse(serialNumber, flags, sequence, data, claimToken) {
   const dataLen = data ? data.length : 0;
   const binary = Buffer.alloc(14 + dataLen);
 
@@ -62,7 +75,7 @@ export function packResponse(serialNumber, flags, sequence, data) {
     data.copy(binary, 14);
   }
 
-  const hash = calculateHash(binary.slice(8));
+  const hash = calculateHash(binary.slice(8), claimToken);
   hash.copy(binary, 0);
 
   return Buffer.from(binary.toString("base64"), "ascii");

@@ -22,8 +22,6 @@ const Settings = () => {
     confirmPassword: "",
   });
 
-  const [darkMode, setDarkMode] = useState(false);
-
   const handleBasicChange = (e) => {
     const { name, value } = e.target;
     setBasicForm((prev) => ({ ...prev, [name]: value }));
@@ -85,25 +83,6 @@ const Settings = () => {
               <Input id="confirmPassword" label="Confirm new password" type="password" value={passwordForm.confirmPassword} onChange={handlePasswordChange} />
               <Button type="submit" variant="primary">Save changes</Button>
             </form>
-          </section>
-
-          <hr className="settings-divider" />
-
-          <section className="settings-section">
-            <span className="settings-section-label">VISUAL</span>
-            <div className="settings-toggle-row">
-              <div className="settings-toggle-info">
-                <span className="settings-toggle-title">Dark mode</span>
-                <span className="settings-toggle-desc">Change to dark theme of the application</span>
-              </div>
-              <label className="settings-toggle">
-                <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)} />
-                <span className="settings-toggle__track">
-                  <span className="settings-toggle__thumb" />
-                </span>
-                <span className="settings-toggle__label">{darkMode ? "On" : "Off"}</span>
-              </label>
-            </div>
           </section>
         </div>
       </div>

@@ -40,4 +40,18 @@ export const deviceService = {
     const response = await api.get("/device/list-all");
     return response.data;
   },
+
+  getConfig: async (deviceId, locationId) => {
+    const response = await api.get(`/device/${deviceId}/config`, {
+      headers: { "x-location-id": locationId },
+    });
+    return response.data;
+  },
+
+  setConfig: async (deviceId, locationId, data) => {
+    const response = await api.put(`/device/${deviceId}/config`, data, {
+      headers: { "x-location-id": locationId },
+    });
+    return response.data;
+  },
 };

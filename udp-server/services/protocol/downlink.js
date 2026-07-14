@@ -17,6 +17,33 @@ const PROFILES = {
   },
 };
 
+// Config field -> firmware shell command name (interval_report -> interval-report)
+const CONFIG_FIELDS = [
+  "interval_report",
+  "interval_sample",
+  "interval_poll",
+  "sensitivity",
+  "motion_sens",
+  "motion_blind",
+  "motion_pulse",
+  "motion_window",
+];
+
+function encodeCommands(commands) {
+  const parts = [Buffer.from([0x9f])]; // indefinite array start
+  for (const cmd of commands) {
+    parts.push(cbor.encode(cmd));
+  }
+  parts.push(Buffer.from([0xff])); // break
+
+  const cborData = Buffer.concat(parts);
+  return Buffer.concat([
+    Buffer.from([DL_DOWNLOAD_CONFIG]),
+    Buffer.from([NOCOMPRESSION]),
+    cborData,
+  ]);
+}
+
 export function buildDownlink(processedData) {
   const voltage = processedData.system?.voltage_rest;
   const serialNumber = processedData.serialNumber;
@@ -36,18 +63,20 @@ export function buildDownlink(processedData) {
     "config save",
   ];
 
-  const parts = [Buffer.from([0x9f])]; // indefinite array start
-  for (const cmd of commands) {
-    parts.push(cbor.encode(cmd));
+  return encodeCommands(commands);
+}
+
+// Builds a downlink from a device's user-queued pendingConfig (Device.pendingConfig
+// in MongoDB), only including whichever fields were actually set.
+export function buildConfigDownlink(pendingConfig) {
+  const commands = [];
+  for (const field of CONFIG_FIELDS) {
+    const value = pendingConfig[field];
+    if (value == null) continue;
+    commands.push(`app config ${field.replace(/_/g, "-")} ${value}`);
   }
-  parts.push(Buffer.from([0xff])); // break
+  if (commands.length === 0) return null;
+  commands.push("config save");
 
-  const cborData = Buffer.concat(parts);
-  const data = Buffer.concat([
-    Buffer.from([DL_DOWNLOAD_CONFIG]),
-    Buffer.from([NOCOMPRESSION]),
-    cborData,
-  ]);
-
-  return data;
+  return encodeCommands(commands);
 }

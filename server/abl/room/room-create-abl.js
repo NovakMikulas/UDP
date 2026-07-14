@@ -10,6 +10,7 @@ const schema = {
     capacity: { type: "number", minimum: 1 },
   },
   required: ["name", "locationId", "capacity"],
+  additionalProperties: false,
 };
 
 async function roomCreateAbl(data) {

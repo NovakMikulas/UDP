@@ -1,6 +1,7 @@
 import { roomController } from "../controller/room-controller.js";
 import authMiddleware from "../middleware/auth/authenticate-middleware.js";
 import authorizeMiddleware from "../middleware/auth/authorize-middleware.js";
+import { resolveRoomLocationId } from "../utils/resource-location-resolvers.js";
 import express from "express";
 const router = express.Router();
 
@@ -21,21 +22,21 @@ router.get(
 router.get(
   "/get/:roomId",
   authMiddleware,
-  authorizeMiddleware(["Owner", "Member"]),
+  authorizeMiddleware(["Owner", "Member"], resolveRoomLocationId),
   roomController.get,
 );
 
 router.put(
   "/update/:roomId",
   authMiddleware,
-  authorizeMiddleware(["Owner"]),
+  authorizeMiddleware(["Owner"], resolveRoomLocationId),
   roomController.update,
 );
 
 router.delete(
   "/delete/:roomId",
   authMiddleware,
-  authorizeMiddleware(["Owner"]),
+  authorizeMiddleware(["Owner"], resolveRoomLocationId),
   roomController.delete,
 );
 

@@ -1,7 +1,12 @@
 import ApiError from "../../utils/api-error.js";
 import locationGetDao from "../../dao/location/location-get-dao.js";
 
-const authorizeLocation = (allowedRoles) => {
+// resolveResourceLocationId, when provided, looks up which location the URL's
+// actual resource (device/room/message) belongs to, derived from the
+// database - never from anything the client supplies. If it doesn't match
+// the claimed locationId, the request is rejected even if the caller has
+// real privileges on the location they claimed.
+const authorizeLocation = (allowedRoles, resolveResourceLocationId) => {
   return async (req, res, next) => {
     try {
       // Extract locationId from URL params, headers, body, or query
@@ -46,6 +51,16 @@ const authorizeLocation = (allowedRoles) => {
           ),
         );
       }
+
+      if (resolveResourceLocationId) {
+        const actualLocationId = await resolveResourceLocationId(req);
+        if (!actualLocationId || actualLocationId.toString() !== locationId.toString()) {
+          return next(
+            new ApiError(403, "[MIDDLEWARE] Resource does not belong to the specified location."),
+          );
+        }
+      }
+
       req.locationId = locationId;
       req.locationRole = userRole;
 

@@ -42,3 +42,17 @@
 .action-menu__item-danger:hover {
   background-color: var(--color-hover-danger);
 }
+
+.action-menu__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-item__badge {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  flex-shrink: 0;
+}

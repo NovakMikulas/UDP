@@ -38,7 +38,7 @@ const LocationList = () => {
   const [kickLocation, setKickLocation] = useState(null);
 
   const { selected, addOpen, setAddOpen, updateOpen, setUpdateOpen,
-          deleteOpen, openAdd, openUpdate, openDelete, closeAll } = useCrudModal();
+    deleteOpen, openAdd, openUpdate, openDelete, closeAll } = useCrudModal();
 
   const fetchLocations = async () => {
     try {
@@ -184,7 +184,7 @@ const LocationList = () => {
           <SearchIcon fontSize="small" />
           <input placeholder="Search location..." value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
-        <Button variant="success" onClick={openAdd}>
+        <Button variant="success" onClick={() => openAdd(() => setAddForm({ name: "", address: emptyAddress }))}>
           <AddIcon fontSize="small" /> Add location
         </Button>
       </div>
@@ -263,7 +263,6 @@ const LocationList = () => {
 
       <Modal isOpen={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite user">
         <form onSubmit={handleInvite} className="modal-form">
-          <p>Invite a user to <strong>{inviteLocation?.name}</strong> by email.</p>
           <Input id="inviteEmail" label="Email" type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="user@example.com" required />
           <Button type="submit" variant="success" fullWidth>Invite</Button>
         </form>
@@ -271,7 +270,6 @@ const LocationList = () => {
 
       <Modal isOpen={kickOpen} onClose={() => setKickOpen(false)} title="Manage members">
         <div className="modal-form">
-          <p>Members of <strong>{kickLocation?.name}</strong></p>
           {kickLocation?.members?.length > 0 ? (
             <div className="kick-member-list">
               {kickLocation.members.map((member) => (

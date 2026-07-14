@@ -21,6 +21,7 @@ const schema = {
     },
   },
   required: ["name", "address", "owner"],
+  additionalProperties: false,
 };
 
 async function locationCreateAbl(data) {

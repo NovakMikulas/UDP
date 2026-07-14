@@ -1,7 +1,7 @@
 import cbor from "cbor";
 import { packResponse, FLAG_FIRST, FLAG_LAST, DL_SET_SESSION } from "./packet.js";
 
-export function buildSessionResponse(serialNumber, sequence) {
+export function buildSessionResponse(serialNumber, sequence, claimToken) {
   const sessionType = Buffer.from([DL_SET_SESSION]);
 
   const ts = BigInt(Math.floor(Date.now() / 1000));
@@ -26,5 +26,5 @@ export function buildSessionResponse(serialNumber, sequence) {
   const cborData = Buffer.concat(parts);
   const data = Buffer.concat([sessionType, cborData]);
 
-  return packResponse(serialNumber, FLAG_FIRST | FLAG_LAST, sequence, data);
+  return packResponse(serialNumber, FLAG_FIRST | FLAG_LAST, sequence, data, claimToken);
 }

@@ -77,7 +77,7 @@ const AllDevices = () => {
         <div className="list-view__search">
           <SearchIcon fontSize="small" />
           <input
-            placeholder="Search device, location, room..."
+            placeholder="Search...."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
