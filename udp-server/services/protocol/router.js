@@ -23,6 +23,12 @@ import { getDevicesCollection } from "../db.js";
 // Pending downlinks per device - keyed by serialNumber
 const pendingDownlinks = new Map();
 
+// Last processed UL_UPLOAD_DATA sequence per device - keyed by serialNumber.
+// Devices retransmit a data packet if they don't receive a valid ACK, so we
+// need to recognize an already-processed sequence and avoid re-decoding /
+// re-sending the webhook for it.
+const lastProcessedSequence = new Map();
+
 export async function handlePacket(msg, send) {
     const peekedSerialNumber = peekSerialNumber(msg);
 
@@ -65,9 +71,16 @@ export async function handlePacket(msg, send) {
             break;
 
         case UL_UPLOAD_DATA: {
+            if (packet.sequence === lastProcessedSequence.get(packet.serialNumber)) {
+                console.log(`[Router] Duplicate packet (sequence ${packet.sequence}) from device ${packet.serialNumber}, re-sending ACK without reprocessing`);
+                send(packResponse(packet.serialNumber, FLAG_ACK, ackSequence, null, claimToken));
+                break;
+            }
+
             const processedData = await decodeMessage(packet.data, packet.serialNumber);
             console.log("[Router] voltage_rest:", processedData.system?.voltage_rest);
             await sendWebhook(processedData);
+            lastProcessedSequence.set(packet.serialNumber, packet.sequence);
 
             // A user-queued config (set via the frontend) takes priority over the
             // automatic voltage-based profile if both happen to be due at once.

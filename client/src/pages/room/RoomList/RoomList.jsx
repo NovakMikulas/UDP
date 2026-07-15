@@ -62,11 +62,15 @@ const RoomList = () => {
                   );
                   const latestMessage = messages[0];
                   if (latestMessage) {
+                    const prevMessage = messages[1];
                     const totalizer = latestMessage.motion?.totalizer;
-                    if (totalizer) {
-                      const entries = device.invertDirection ? totalizer.motion_right : totalizer.motion_left;
-                      const exits = device.invertDirection ? totalizer.motion_left : totalizer.motion_right;
-                      currentlyInside += Math.max(0, (entries || 0) - (exits || 0));
+                    const prevTotalizer = prevMessage?.motion?.totalizer;
+                    if (totalizer && prevTotalizer) {
+                      const leftDelta = Math.max(0, (totalizer.motion_left ?? 0) - (prevTotalizer.motion_left ?? 0));
+                      const rightDelta = Math.max(0, (totalizer.motion_right ?? 0) - (prevTotalizer.motion_right ?? 0));
+                      const entries = device.invertDirection ? rightDelta : leftDelta;
+                      const exits = device.invertDirection ? leftDelta : rightDelta;
+                      currentlyInside += Math.max(0, entries - exits);
                     }
                     const age = Date.now() - new Date(latestMessage.createdAt);
                     if (isVoltageAlive(latestMessage.system?.voltage_rest) && age < OFFLINE_THRESHOLD_MS) {
