@@ -37,4 +37,9 @@ const messageSchema = new Schema(
   { timestamps: true },
 );
 
+// Safety net against duplicate webhook deliveries (e.g. a UDP retransmit that
+// slips past the router's in-memory dedup, such as after a server restart).
+// Sparse because message.sequence isn't required by the create schema.
+messageSchema.index({ deviceId: 1, "message.sequence": 1 }, { unique: true, sparse: true });
+
 export default model("Message", messageSchema);
