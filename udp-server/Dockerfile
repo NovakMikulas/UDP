@@ -7,6 +7,6 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-EXPOSE 4444/udp
+EXPOSE 5003/udp
 
 CMD ["node", "server.js"]
