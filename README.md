@@ -14,7 +14,7 @@ The system consists of three components:
 
 - Docker and Docker Compose
 - OpenVPN client (required for Vodafone IoT Easy Connect SIM routing)
-- Node.js 18+ (for local development only)
+- Node.js 22+ and a local MongoDB instance (for local development only)
 
 ## Environment Variables
 
@@ -27,6 +27,9 @@ REACT_APP_API_URL=http://your-server-ip:3000
 REACT_APP_SERVER_URL=http://your-server-ip:3000
 CORS_ORIGIN=http://your-server-ip
 ```
+
+> `REACT_APP_API_URL` must **not** include an `/api` suffix — the frontend appends
+> `/api` itself, so `http://your-server-ip:3000` (not `.../3000/api`) is correct.
 
 ## Running with Docker
 
@@ -110,6 +113,9 @@ The server handles the full session handshake (`UL_CREATE_SESSION` → `ACK+POLL
 
 ## Local Development
 
+Requires a MongoDB instance running locally (e.g. `docker run -d -p 27017:27017 mongo:7`)
+before starting the backend or UDP server.
+
 **Backend:**
 ```bash
 cd server
@@ -121,7 +127,7 @@ npm run dev
 ```bash
 cd udp-server
 npm install
-node server.js
+npm start
 ```
 
 **Frontend:**
